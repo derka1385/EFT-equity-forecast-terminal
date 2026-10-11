@@ -10,18 +10,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.2.1/chartjs-plugin-zoom.min.js"></script>
 <style>
 :root{
-  --bg:#0a0a0a;--bg1:#111111;--bg2:#161616;--bg3:#1c1c1c;
-  --line:#2a2a2a;--line2:#333333;--muted:#444444;--dim:#666666;
-  --mid:#888888;--text:#bbbbbb;--bright:#eeeeee;--white:#f5f5f5;
-  --bull:#48c778;--neu:#5aa0ff;--bear:#ff5a5a;
-  --consensus:#f0c040;
-  --bull-fill:rgba(72,199,120,0.07);--neu-fill:rgba(90,160,255,0.07);--bear-fill:rgba(255,90,90,0.07);
-  --cons-fill:rgba(240,192,64,0.08);
+  --bg:#090b0d;--bg1:#0f1215;--bg2:#14181c;--bg3:#1a1f24;
+  --line:#252b31;--line2:#303840;--muted:#505a63;--dim:#717b84;
+  --mid:#98a1a8;--text:#c5cbd0;--bright:#e6e9eb;--white:#f0f1ef;
+  --bull:#7fb39a;--neu:#89a8bd;--bear:#c97872;
+  --consensus:#b8a36f;
+  --bull-fill:rgba(127,179,154,0.07);--neu-fill:rgba(137,168,189,0.07);--bear-fill:rgba(201,120,114,0.07);
+  --cons-fill:rgba(184,163,111,0.08);
   --font:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:12px;min-height:100vh;cursor:default;-webkit-text-size-adjust:100%}
-body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:9999}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.018) 2px,rgba(0,0,0,0.018) 4px);pointer-events:none;z-index:9999}
 
 /* TOPBAR */
 .topbar{background:var(--bg1);border-bottom:1px solid var(--line);padding:0 16px;height:36px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;gap:8px}
@@ -91,11 +91,11 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 
 /* RUN */
 .run-btn{width:100%;background:var(--neu);color:var(--bg);border:none;padding:14px;font-family:var(--font);font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .15s;margin-bottom:4px;touch-action:manipulation}
-.run-btn:hover{background:#7bb8ff}.run-btn:active{transform:scale(0.99)}
+.run-btn:hover{background:#a1bac9}.run-btn:active{transform:scale(0.99)}
 .validation-msg{font-size:9px;color:var(--bear);letter-spacing:.06em;min-height:16px;margin-bottom:16px;padding-left:2px}
 .validation-msg.ok{color:var(--bull)}
 
-/* CONFIDENCE INDEX */
+/* FORECAST RELIABILITY INDEX */
 .confidence-block{background:var(--bg1);border:1px solid var(--line);margin-bottom:20px;display:grid;grid-template-columns:200px 1fr;gap:0}
 @media(max-width:600px){.confidence-block{grid-template-columns:1fr}.conf-score-side{border-right:none;border-bottom:1px solid var(--line);flex-direction:row;justify-content:flex-start;gap:20px;padding:14px 16px}.conf-gauge-wrap{padding:14px 16px}}
 .conf-score-side{padding:20px 24px;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
@@ -111,6 +111,20 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 .conf-bar-track{flex:1;height:4px;background:var(--line2);position:relative;min-width:60px}
 .conf-bar-fill{height:100%;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
 .conf-bar-val{font-size:9px;color:var(--mid);min-width:36px;text-align:right}
+
+/* REFINED RELIABILITY SCALE — muted institutional palette */
+.reliability-scale{margin:-10px 0 20px;border:1px solid var(--line);border-top:none;background:linear-gradient(180deg,var(--bg1),rgba(15,18,21,.72));padding:11px 14px 10px}
+.rel-scale-track{display:grid;grid-template-columns:24fr 15fr 15fr 20fr 26fr;height:3px;gap:3px;margin-bottom:9px}
+.rel-seg{display:block;opacity:.92}
+.rel-vlow{background:#c97872}.rel-low{background:#b98a70}.rel-limited{background:#b8a36f}.rel-moderate{background:#89a8bd}.rel-strong{background:#7fb39a}
+.rel-scale-labels{display:grid;grid-template-columns:24fr 15fr 15fr 20fr 26fr;gap:3px;text-align:center}
+.rel-scale-labels span{font-size:8px;letter-spacing:.06em;color:var(--dim);min-width:0}
+.rel-scale-labels b{display:block;font-weight:500;font-size:9px;letter-spacing:.03em;margin-bottom:2px}
+.rel-scale-labels small{font-size:7px;letter-spacing:.11em;color:var(--muted)}
+.rel-c-vlow{color:#c97872}.rel-c-low{color:#b98a70}.rel-c-limited{color:#b8a36f}.rel-c-moderate{color:#89a8bd}.rel-c-strong{color:#7fb39a}
+.rel-scale-note{margin-top:9px;padding-top:8px;border-top:1px solid rgba(80,90,99,.28);text-align:center;font-size:8px;color:var(--muted);letter-spacing:.045em}
+.rel-scale-note span{color:var(--line2);padding:0 4px}
+@media(max-width:600px){.rel-scale-labels small{display:none}.reliability-scale{padding-left:10px;padding-right:10px}}
 
 /* RESULTS HEADER */
 .ticker-header{display:flex;align-items:baseline;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
@@ -230,7 +244,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--brig
     <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFQAAAA4CAYAAABjXd/gAAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAAHzklEQVR42u2bX4xcVR3HP79zz8ydP7uz3a7tbst213YLClIoUKAWkyr4YEyNT0ZBX0yN0aiJ8EqqD74aU4hKwqt/QoQmxmAkTRBSUmu1iAilkAKFlrbbP7s7f/bO/XvO8WG20+7aNi12d3bbOcm8zOTeuedzfr/v78+5R8qlPgfgnON6HSLSnp+IcC3me7H7iAjKOXddw5w76Ws517n3cs6huAHHtYB6qXvckEDnc3SBdoF2gXaBdkcX6KIZ+jpL4RHVshFnTRfo/wvT2QyTRDhj8Ao9iHiA6wL9GHUgzqQUlq2hb+QedKHCqTf+RBbWEKUXFOr1oaHOoXSesHoMnS9w06aHyZdX4GwK0g1Kl7XEi36tNEmzyvJPbkbE4/BffoZ4Hs6BLCBREVlCLi+CzWKUl/8fmGlzkoGxB1g+toX3XvwFojQiCi9XwDm7oD0CtVRguiyl2L9mJnq78zDDKfpGN7HyU1/k/b/uRES1AtQCglxSLi+iMEmTyvAG1m79Hmvu/QYmaaK8HGlYpbLqdoY2bOPdl3a2IC5wEFp6GiqAtfSv+xzv7v45UTDJyAPfoTk9Qe+qW7lp09c58tIvsVnSkoMOWebiByrS0s00prh8BOcsSTDF+Ot/JEtCbn7wUVbf+VU+2PMUWdzA037H3Hzx56HOYbMI5fmYNKJvzV2EZ9/DZjG50jJOHHiG5Wu3EJx5hySYxMsVFwXMRWKhMpMOnfs4ELjlyz+hMnwnzjlKK8aoHfs3Xr6IsxYvX2Ty/VdIw/qigtlxCxVRWJPibIZSGjxNFk6z8jNfojnxIb3DGzFpgMsSwupxcsVKK8o70H4vrf0wu6icS3USpkmaqFyBtV/4MYN3fQ1shs4XqQzfwcl/PUv9+OuMPPBdzrzzIsrTMGuzzXY0mi8uC51J0gv9w4xs2c7x156jb2Qz5eXDiGiSoE4a1qkfe423Tx7CJAGifewVdJBE5AYE6ixK+wxt+Aof7f8NtfG3KVYG6Rm8BZUvEU8cJpfPo/MFrM3w/NIVW6MxpqPb4lIqVjrw7w5Ruq2fnvYplnoY2fojbJowvv9plFJtMOdfUjiXmJ5/ecE517ZKEWF6epo0TTtmqR0CyozFSbvhYZKI3tW3YdOY6TPvorQ/SzOvpkHRSbfvINDzADzPQ1QrSBljUfp8U8PzvFmvvRhjZl13YWPi3G83cNokpGlG0Ky1vysV+9owRYTGdAPIZn71KJd6cM5hrZ11HUC51Nfx14o6ZqEiQpImDA8Ps337t/F9n3qtxpNP/oo4jtFaEych27Zt4/7778PzNHv3/o0/P/88Wucpl8v84IffR2uNEmFicpKnfv00HQ7yncxDhTQN2bDhdjZvvp9du55l79597SCjlJCmMY888jBnz55l167nOPL+ETxPtwPSvn172bjxDgaHBjlw4B94XucLvw4/gRCFEc5aRkdHybKMMGq2rE619LHRaFAu97Bq1SomJiZbOqU1SZKwe/du9u//Jy+/vIc9e/agte54Htr5JRUQpdrBR0QIgoBqbbIdbAYHVzIyMkKlUiGKQ+qNSdTMNcVikXKphFKKau0sURR1FGqHgTqKxSLWWg4dOtSCivDQQw/y2KOPAdDf38/vfvt7nnhiJ28dOsjdd23i8cd3EMcxxhhKpSKFQgFrLTt2/JS777mbOA5RSnVExjoW5Z1z5HSRN/7zJq8eeJVvPvItwihi376/k5mMOI7JaZ9nnvkDU1NVioVeMpNiTEYSJ1hryWmfF17YTa1aI6d94ijCGjOT+7uOzGneo/zl3K8VmFLiJJiV+kRRhLExPeVlTAfT+HmfXC4HQBzHpFlIT3kZAEEQoLXG932mgypaFyn4/kXTp/lOqURk/oEmSYJSCmPsjE626m0RwRiL1h5a61aaFMdYa1GiQMAai/IUzrW6S0qpdkmaZRkigu/7RGEE0gpW1ljsBS09QUCYpdFLMg8VEaw1jI6O0myGlHtK1Gp1siyjv7+fLE2p9PVRnaqSpgkTE5OsXz9G0AzwvFZumRlDTmuiOEIQmmGI53mUS2VyuVakP3lynFtv+zT1egNrDJ72MJlBa02WtQoCUYpqtUocxe0FXpKVkrWWrZ/fypEPjrBmeJg4jmk0GjgHJ04cp6/Sx+rVq6hOVanV6tx73yY++ug4g0NDDK5cQa1epxk0aTTqnD59mi1bPsuHHx6jUqlw9OhRqlNVjh49ysqVK1i/fox6vcH6m8dI44TBoSHiOCYImnhacfrUad584yAHD76FfwlJWPQWaqxhbGyMRqPGurXrmJyaIo4TnHXU63WSJAEcxlistfi+j+d5DHxigEa9js7lKBaKhGGTcrlMEASIUpRLJcbHT5FmKVEYUS6X6O2tUCj4hGEIIsRRzMDAAM45ms0mhYJPPu9z+PDheXX7BdVQpeSCSkjNTEza5eK5dpwxptX4cGCsaevmORDW2pYsKJmRltaCzG3ltXqjtP8XIJ/PL+1a/sIJnpvweXdzszp0F1rOlRzQmnuY60pTmyXdbbrY4ahLTerjHtBaTAfXFqycmNt9v17HgtZn1zvMxdEc6QLtji7QLtAu0CU/rkX1JCJdoNc6A+kCvcaLorru2tXQi1rGYoDa1dD5cPm52wKX2ia4WCfocit1tdsNV2thV/M8CyUdIsJ/ATFN0n8BYV3LAAAAAElFTkSuQmCC" style="height:26px;width:auto;margin-right:10px;object-fit:contain;" alt="EFT Logo">
     <span class="t-id">EFT // EQUITY FORECAST TERMINAL</span>
     <span class="t-sep"></span>
-    <span class="t-tag">Standalone · GBM + Bayesian Calibration · Confidence Index · Resilient Live Feed · v5.2</span>
+    <span class="t-tag">Standalone · GBM + Bayesian Calibration · Forecast Reliability Index · Resilient Live Feed · v5.2</span>
   </div>
   <div style="display:flex;align-items:center;gap:20px">
     <span class="clock" id="clock">--:--:-- UTC</span>
@@ -253,8 +267,8 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--brig
       <div class="input-section-title">Asset Information</div>
       <div class="field"><label>Ticker / Nom</label><input type="text" id="iName" value="AAPL" placeholder="Ex: AAPL, LVMH…"></div>
       <div class="field"><label>Secteur</label><input type="text" id="iSector" value="Tech"></div>
-      <div class="field"><label>Horizon prévision (j)</label><input type="number" id="iHorizon" value="20" min="5" max="60"></div>
-      <div class="field"><label>Simulations Monte Carlo</label><input type="number" id="iNsim" value="800" min="200" max="2000"></div>
+      <div class="field"><label>Horizon prévision (j)</label><input type="number" id="iHorizon" value="90" min="5" max="252"></div>
+      <div class="field"><label>Simulations Monte Carlo</label><input type="number" id="iNsim" value="20000" min="5000" max="50000" step="1000"></div>
     </div>
     <div class="input-section">
       <div class="input-section-title">Theoretical Probabilities (optional)</div>
@@ -299,10 +313,10 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--brig
       title="Actions US: AAPL TSLA MSFT | Crypto: BTC-USD ETH-USD | Forex: EURUSD=X GBPUSD=X | Paris: MC.PA BNP.PA">
     <select id="yPeriod">
       <option value="30">30 jours</option>
-      <option value="60" selected>60 jours</option>
+      <option value="60">60 jours</option>
       <option value="90">90 jours</option>
       <option value="180">180 jours</option>
-      <option value="365">1 an</option>
+      <option value="365" selected>1 an</option>
     </select>
     <button class="fetch-btn" id="fetchBtn" onclick="fetchData()">⬇ Fetch Data</button>
     <span class="fetch-status" id="fetchStatus" style="display:none"></span>
@@ -332,8 +346,8 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--brig
   <button class="back-btn" onclick="switchTab('input')">← Back to Input</button>
   <div class="ticker-header" id="tickerHeader"></div>
 
-  <!-- CONFIDENCE INDEX -->
-  <div class="slabel">Confidence Index</div>
+  <!-- FORECAST RELIABILITY INDEX -->
+  <div class="slabel">Forecast Reliability Index</div>
   <div class="confidence-block" id="confBlock">
     <div class="conf-score-side">
       <div class="conf-score-num" id="confNum">—</div>
@@ -346,6 +360,23 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--brig
       <div id="confBars"></div>
     </div>
   </div>
+  <div id="reliabilityScale" class="reliability-scale">
+    <div class="rel-scale-track">
+      <span class="rel-seg rel-vlow"></span>
+      <span class="rel-seg rel-low"></span>
+      <span class="rel-seg rel-limited"></span>
+      <span class="rel-seg rel-moderate"></span>
+      <span class="rel-seg rel-strong"></span>
+    </div>
+    <div class="rel-scale-labels">
+      <span><b class="rel-c-vlow">0–24</b><small>VERY LOW</small></span>
+      <span><b class="rel-c-low">25–39</b><small>LOW</small></span>
+      <span><b class="rel-c-limited">40–54</b><small>LIMITED</small></span>
+      <span><b class="rel-c-moderate">55–74</b><small>MODERATE</small></span>
+      <span><b class="rel-c-strong">75–100</b><small>STRONG</small></span>
+    </div>
+    <div class="rel-scale-note">Forecast evidence at selected horizon <span>·</span> not a probability of being correct</div>
+  </div>
 
   <div class="slabel">Model Parameters</div>
   <div class="insights" id="insights"></div>
@@ -355,8 +386,8 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--brig
 
   <div class="controls">
     <div class="ctrl">Forecast Horizon
-      <input type="range" id="slH" min="5" max="60" value="20" step="1">
-      <span id="vH">20 D</span>
+      <input type="range" id="slH" min="5" max="252" value="90" step="1">
+      <span id="vH">90 D</span>
     </div>
   </div>
 
@@ -364,14 +395,10 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--brig
   <div class="chart-box">
     <div class="legend">
       <span class="leg"><span class="leg-dot" style="background:var(--mid)"></span>Historical</span>
-      <span class="leg"><span class="leg-line" style="background:var(--bull)"></span>Bullish</span>
-      <span class="leg"><span class="leg-line" style="background:var(--neu)"></span>Neutral</span>
-      <span class="leg"><span class="leg-line" style="background:var(--bear)"></span>Bearish</span>
-      <span class="leg"><span class="leg-line" style="background:var(--consensus);height:3px"></span>Consensus ★</span>
-      <span class="leg"><span class="leg-band" style="background:var(--consensus)"></span>±1σ consensus</span>
-      <span class="leg"><span class="leg-line" style="background:var(--line2)"></span>OLS trend</span>
-      <span class="leg"><span class="leg-line" style="background:rgba(240,192,64,0.55)"></span>Bollinger MA</span>
-      <span class="leg"><span class="leg-band" style="background:rgba(240,192,64,0.3)"></span>Bollinger ±2σ</span>
+      <span class="leg"><span class="leg-line" style="background:var(--consensus);height:3px"></span>Weighted median ★</span>
+      <span class="leg"><span class="leg-band" style="background:rgba(240,192,64,0.35)"></span>P25–P75</span>
+      <span class="leg"><span class="leg-band" style="background:rgba(90,160,255,0.18)"></span>P10–P90</span>
+      <span class="leg"><span class="leg-line" style="background:#3a3a3a"></span>Representative particles</span>
     </div>
     <div class="zoom-controls">
       <span class="zoom-hint">Zoom</span>
@@ -408,7 +435,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--brig
   </div>
 
   <div class="footer">
-    <div class="footer-l">EFT v5.2 · GBM + AR(1) + Bayesian Fusion + Confidence Index · Resilient Market Feed · Not investment advice</div>
+    <div class="footer-l">EFT v5.2 · GBM + AR(1) + Bayesian Fusion + Forecast Reliability Index · Resilient Market Feed · Not investment advice</div>
     <div class="footer-r" id="footerDate"></div>
     <div style="width:100%;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
       <span style="font-size:9px;color:var(--muted);letter-spacing:.08em">Student Project · Built by a 12th grade student · <span style="color:var(--dim)">Nolann Petri</span></span>
@@ -421,7 +448,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--brig
   <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
     <div>
       <div class="slabel" style="margin-bottom:4px">Mathematical &amp; Statistical Documentation</div>
-      <div style="font-size:9px;color:var(--dim);letter-spacing:.06em">EFT v5.2 · GBM · Bayesian Calibration · Monte Carlo · Confidence Index · Risk Score</div>
+      <div style="font-size:9px;color:var(--dim);letter-spacing:.06em">EFT v5.2 · GBM · Bayesian Calibration · Monte Carlo · Forecast Reliability Index · Risk Score</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <div style="display:flex;gap:6px;align-items:center">
@@ -433,15 +460,35 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--brig
          style="display:inline-flex;align-items:center;gap:8px;background:none;border:1px solid var(--line2);color:var(--dim);font-family:var(--font);font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:8px 14px;cursor:pointer;text-decoration:none;transition:all .15s"
          onmouseover="this.style.borderColor='var(--mid)';this.style.color='var(--mid)'"
          onmouseout="this.style.borderColor='var(--line2)';this.style.color='var(--dim)'">
-        ⬇ Download PDF
+        ⬇ Download legacy v5 PDF
       </a>
     </div>
   </div>
+
+  <div style="background:var(--bg1);border:1px solid var(--line);padding:16px 18px;margin-bottom:16px;line-height:1.65">
+    <div style="font-size:10px;color:var(--bright);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">v6.0 Research Engine — Mathematical Core</div>
+    <div style="font-size:9px;color:var(--mid);margin-bottom:12px">
+      Objective: estimate a time-varying predictive distribution rather than one deterministic target. Daily log returns use Bayesian-shrunk drift and AR(1), conditional variance uses GJR-GARCH(1,1), shocks use Student-t innovations, and a 3-state duration-aware latent regime model lets the drift/volatility environment switch through time, with exit probabilities that depend on how long a regime has persisted. Tens of thousands of sequential Monte Carlo particles propagate those hidden regimes day by day.
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+      <div style="border:1px solid var(--line);padding:10px"><strong style="color:var(--bright)">Mean / drift</strong><br><span style="color:var(--dim)">μ_post = (N μ_hist + k μ_prior)/(N + k + 60). The extra zero-drift shrinkage is deliberate: expected short-horizon equity returns are extremely noisy to estimate.</span></div>
+      <div style="border:1px solid var(--line);padding:10px"><strong style="color:var(--bright)">Conditional variance</strong><br><span style="color:var(--dim)">hₜ = ω + αε²ₜ₋₁ + γε²ₜ₋₁I(εₜ₋₁&lt;0) + βhₜ₋₁. The γ term allows negative shocks to affect future volatility differently.</span></div>
+      <div style="border:1px solid var(--line);padding:10px"><strong style="color:var(--bright)">Heavy tails</strong><br><span style="color:var(--dim)">εₜ = √hₜ zₜ with standardized Student-t zₜ. Degrees of freedom ν are calibrated by likelihood, allowing fatter tails than Gaussian GBM.</span></div>
+      <div style="border:1px solid var(--line);padding:10px"><strong style="color:var(--bright)">Tail risk</strong><br><span style="color:var(--dim)">VaR 95%, Expected Shortfall 95%, probability of loss and P5–P95 dispersion are computed directly from the simulated terminal-price distribution.</span></div>
+    </div>
+    <div style="font-size:9px;color:var(--dim);margin-top:12px;padding-top:10px;border-top:1px solid var(--line)">
+      Research lineage: Engle (1982) ARCH · Bollerslev (1986, 1987) GARCH / Student-t · Glosten, Jagannathan &amp; Runkle (1993) asymmetric volatility · Hansen (1994) conditional Student-t density · J.P. Morgan RiskMetrics (1996) EWMA diagnostics · Welch &amp; Goyal (2008; updated 2024) out-of-sample caution on equity-return predictability.
+    </div>
+    <div style="font-size:9px;color:var(--bear);margin-top:8px">
+      Limitation: daily historical prices alone do not make individual-stock returns reliably predictable. v6 improves volatility/tail calibration; it does not create a guaranteed directional edge. Proper walk-forward backtesting and richer data remain necessary.
+    </div>
+  </div>
+
   <div id="pdfContainer" style="background:var(--bg1);border:1px solid var(--line);overflow-y:auto;max-height:82vh;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px">
     <div id="pdfLoading" style="padding:48px;color:var(--muted);font-size:10px;letter-spacing:.1em;text-transform:uppercase">Chargement du document…</div>
   </div>
   <div style="margin-top:10px;font-size:9px;color:var(--muted);letter-spacing:.06em;text-align:right">
-    EFT Mathematical Documentation v5.0 · Nolann Petri · © 2025
+    Legacy PDF v5.0 · v6 research methodology is documented above · Nolann Petri · © 2025
   </div>
 </div>
 
@@ -762,7 +809,7 @@ async function fetchViaControlledProxy(ticker, days){
 // Public relays are only a fallback. A controlled proxy is more reliable for a hosted app.
 async function fetchYahoo(ticker, days){
   const period2  = Math.floor(Date.now() / 1000);
-  const period1  = period2 - (days + 25) * 86400; // buffer for weekends/holidays
+  const period1  = period2 - Math.ceil(days * 1.60 + 45) * 86400; // buffer for weekends/holidays
   const mkYahoo  = host => `https://${host}/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&period1=${period1}&period2=${period2}&events=div%2Csplits&includeAdjustedClose=true`;
   const targets  = [mkYahoo('query1.finance.yahoo.com'), mkYahoo('query2.finance.yahoo.com')];
 
@@ -853,7 +900,7 @@ async function fetchData(){
   try { ticker = normalizeTicker(document.getElementById('yTicker').value); }
   catch(e){ setFetchStatus(e.message, 'err'); return; }
 
-  const days   = Math.max(3, Math.min(365, parseInt(document.getElementById('yPeriod').value) || 60));
+  const days   = Math.max(3, Math.min(1260, parseInt(document.getElementById('yPeriod').value) || 756));
   const type   = detectAssetType(ticker);
   const labels = { stock:'Action', crypto:'Crypto', forex:'Forex', index:'Indice' };
 
@@ -982,7 +1029,7 @@ function getBands(P0,days,mu,sig,ac,N){
 }
 
 /* ══════════════════════════════════════════
-   CONFIDENCE INDEX — score /100
+   FORECAST RELIABILITY INDEX — score /100
    Basé sur des mesures statistiques réelles :
 
    1. Précision de l'estimateur μ̂        → IC relatif de la moyenne (CLT)
@@ -1253,10 +1300,10 @@ function calcRisk(model, autocorr, horizon, simFinals){
                 : score >= 15 ? 'FAIBLE'
                 :               'TRÈS FAIBLE';
 
-  const color = score >= 50 ? '#ff5a5a'
-              : score >= 30 ? '#f0c040'
-              : score >= 15 ? '#48c778'
-              :               '#5aa0ff';
+  const color = score >= 50 ? '#c97872'
+              : score >= 30 ? '#b8a36f'
+              : score >= 15 ? '#7fb39a'
+              :               '#89a8bd';
 
   return {
     score, verdict, color,
@@ -1280,7 +1327,7 @@ function renderRisk(risk, horizon){
 
   // ── 5 métriques ─────────────────────────────────────────────────
   document.getElementById('riskMetrics').innerHTML = risk.components.map(c => {
-    const col = c.pct >= 75 ? '#ff5a5a' : c.pct >= 50 ? '#f0c040' : c.pct >= 25 ? '#48c778' : '#5aa0ff';
+    const col = c.pct >= 75 ? '#c97872' : c.pct >= 50 ? '#b8a36f' : c.pct >= 25 ? '#7fb39a' : '#89a8bd';
     return `<div class="risk-metric" style="--mc:${col}">
       <div class="risk-metric-lbl">${c.lbl}</div>
       <div class="risk-metric-val" style="color:${col}">${c.val}</div>
@@ -1292,7 +1339,7 @@ function renderRisk(risk, horizon){
   const w = risk.weights;
   const wArr = [w.w1,w.w2,w.w3,w.w4];
   document.getElementById('riskMeters').innerHTML = risk.components.map((c,i) => {
-    const col   = c.pct >= 75 ? '#ff5a5a' : c.pct >= 50 ? '#f0c040' : c.pct >= 25 ? '#48c778' : '#5aa0ff';
+    const col   = c.pct >= 75 ? '#c97872' : c.pct >= 50 ? '#b8a36f' : c.pct >= 25 ? '#7fb39a' : '#89a8bd';
     const wPct  = (wArr[i]*100).toFixed(0);
     const contrib = (c.pct * wArr[i]).toFixed(1);
     return `<div class="risk-meter-item">
@@ -1344,22 +1391,22 @@ function renderAll(){
   if(!MODEL) return;
   const d=MODEL;
   const ac=calcAutocorr(d.hist);
-  const N_BANDS=Math.min(d.n_sim,500);
+  const N_BANDS=Math.min(d.n_sim,1000);
 
   const SC=[
-    {label:'Bullish', cls:'opt',      color:'#48c778', fill:'rgba(72,199,120,0.07)',  mu:d.mu+d.mu_uncert, sig:d.sigma*0.85, seed:0},
-    {label:'Neutral', cls:'neu-card', color:'#5aa0ff', fill:'rgba(90,160,255,0.07)',  mu:d.mu,             sig:d.sigma,      seed:100},
-    {label:'Bearish', cls:'pes',      color:'#ff5a5a', fill:'rgba(255,90,90,0.07)',   mu:d.mu-d.mu_uncert, sig:d.sigma*1.15, seed:200},
+    {label:'Bullish', cls:'opt',      color:'#7fb39a', fill:'rgba(127,179,154,0.07)',  mu:d.mu+d.mu_uncert, sig:d.sigma*0.85, seed:0},
+    {label:'Neutral', cls:'neu-card', color:'#89a8bd', fill:'rgba(137,168,189,0.07)',  mu:d.mu,             sig:d.sigma,      seed:100},
+    {label:'Bearish', cls:'pes',      color:'#c97872', fill:'rgba(201,120,114,0.07)',   mu:d.mu-d.mu_uncert, sig:d.sigma*1.15, seed:200},
   ];
 
   const N_HIST=d.hist.length;
   const labels=[...d.hist.map((_,i)=>`J${i}`),...Array.from({length:currentHorizon},(_,i)=>`J${N_HIST+i}`)];
   const pad=n=>[...Array(n).fill(null)];
 
-  /* ── CONFIDENCE INDEX ── */
+  /* ── FORECAST RELIABILITY INDEX ── */
   const conf=calcConfidence(d,ac,currentHorizon);
   const confColor=conf.total>=70?'var(--bull)':conf.total>=45?'var(--consensus)':'var(--bear)';
-  const confVerdict=conf.total>=70?'HIGH CONFIDENCE':conf.total>=45?'MODERATE':'LOW CONFIDENCE';
+  const confVerdict=conf.verdict || (conf.total>=70?'STRONG EVIDENCE':conf.total>=45?'MODERATE EVIDENCE':'LOW EVIDENCE');
   document.getElementById('confNum').textContent=conf.total;
   document.getElementById('confHorizonLabel').textContent='@ J+'+currentHorizon;
   document.getElementById('confNum').style.color=confColor;
@@ -1368,8 +1415,8 @@ function renderAll(){
   document.getElementById('confBars').innerHTML=conf.components.map((c,i)=>{
     const isTemporal = i===4;
     const barColor = isTemporal
-      ? (c.score>=70?'#5aa0ff':c.score>=45?'#888888':'#444444')
-      : (c.score>=70?'#48c778':c.score>=45?'#f0c040':'#ff5a5a');
+      ? (c.score>=70?'#89a8bd':c.score>=45?'#98a1a8':'#505a63')
+      : (c.score>=70?'#7fb39a':c.score>=45?'#b8a36f':'#c97872');
     const rowStyle = isTemporal ? 'border-top:1px solid var(--line);padding-top:10px;margin-top:2px;' : '';
     return `<div class="conf-bar-row" style="${rowStyle}">
       <span class="conf-bar-lbl">${c.lbl} <span style="color:var(--muted)">(×${c.weight}%)</span></span>
@@ -1382,7 +1429,7 @@ function renderAll(){
   }).join('')
 
   /* ── CONSENSUS BANDS ── */
-  const consBands=getConsensusBands(d.P0,currentHorizon,SC,ac,Math.min(N_BANDS,300));
+  const consBands=getConsensusBands(d.P0,currentHorizon,SC,ac,Math.min(N_BANDS,600));
 
   /* ── DATASETS ── */
   const datasets=[];
@@ -1393,7 +1440,7 @@ function renderAll(){
     data:[...d.hist,...Array(currentHorizon).fill(null)],
     borderColor:'#777',borderWidth:1.5,backgroundColor:'#888',
     pointRadius:[...d.hist.map(()=>3),...Array(currentHorizon).fill(0)],
-    pointBackgroundColor:'#aaa',pointBorderColor:'#0a0a0a',pointBorderWidth:1,
+    pointBackgroundColor:'#aaa',pointBorderColor:'#090b0d',pointBorderWidth:1,
     fill:false,tension:.2,order:0,
   });
 
@@ -1402,7 +1449,7 @@ function renderAll(){
   datasets.push({
     label:'Tendance',
     data:[...pad(N_HIST-1),d.hist[N_HIST-1],...olsFut],
-    borderColor:'#2a2a2a',borderWidth:1,borderDash:[4,6],
+    borderColor:'#252b31',borderWidth:1,borderDash:[4,6],
     pointRadius:0,fill:false,tension:0,order:1,
   });
 
@@ -1438,7 +1485,7 @@ function renderAll(){
     datasets.push({
       label:'Bollinger MA',
       data:[...bollMid,...bollPad],
-      borderColor:'rgba(240,192,64,0.55)',borderWidth:1,
+      borderColor:'rgba(184,163,111,0.45)',borderWidth:1,
       pointRadius:0,fill:false,tension:.3,order:7,
     });
 
@@ -1460,7 +1507,7 @@ function renderAll(){
     const base=[...pad(N_HIST-1),d.P0];
     datasets.push({label:`_lo_${sc.label}`,data:[...base,...bands.map(b=>+b.p20.toFixed(2))],borderColor:'transparent',backgroundColor:sc.fill,fill:'+1',pointRadius:0,tension:.4,order:4});
     datasets.push({label:`_hi_${sc.label}`,data:[...base,...bands.map(b=>+b.p80.toFixed(2))],borderColor:'transparent',backgroundColor:sc.fill,fill:false,pointRadius:0,tension:.4,order:4});
-    datasets.push({label:sc.label,data:[...base,...bands.map(b=>+b.p50.toFixed(2))],borderColor:sc.color,borderWidth:1.6,backgroundColor:'transparent',fill:false,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:sc.color,pointHoverBorderColor:'#0a0a0a',pointHoverBorderWidth:1,tension:.4,order:3});
+    datasets.push({label:sc.label,data:[...base,...bands.map(b=>+b.p50.toFixed(2))],borderColor:sc.color,borderWidth:1.6,backgroundColor:'transparent',fill:false,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:sc.color,pointHoverBorderColor:'#090b0d',pointHoverBorderWidth:1,tension:.4,order:3});
   });
 
   // Consensus band ±1σ
@@ -1468,25 +1515,25 @@ function renderAll(){
   datasets.push({
     label:'_cons_lo',
     data:[...consBase,...consBands.map(b=>+b.lo.toFixed(2))],
-    borderColor:'transparent',backgroundColor:'rgba(240,192,64,0.08)',
+    borderColor:'transparent',backgroundColor:'rgba(184,163,111,0.08)',
     fill:'+1',pointRadius:0,tension:.4,order:6,
   });
   datasets.push({
     label:'_cons_hi',
     data:[...consBase,...consBands.map(b=>+b.hi.toFixed(2))],
-    borderColor:'transparent',backgroundColor:'rgba(240,192,64,0.08)',
+    borderColor:'transparent',backgroundColor:'rgba(184,163,111,0.08)',
     fill:false,pointRadius:0,tension:.4,order:6,
   });
   // Consensus median — ligne principale épaisse
   datasets.push({
     label:'Consensus',
     data:[...consBase,...consBands.map(b=>+b.median.toFixed(2))],
-    borderColor:'#f0c040',borderWidth:2.5,
+    borderColor:'#b8a36f',borderWidth:2.5,
     borderDash:[],
     backgroundColor:'transparent',fill:false,
     pointRadius:0,pointHoverRadius:6,
-    pointHoverBackgroundColor:'#f0c040',
-    pointHoverBorderColor:'#0a0a0a',pointHoverBorderWidth:2,
+    pointHoverBackgroundColor:'#b8a36f',
+    pointHoverBorderColor:'#090b0d',pointHoverBorderWidth:2,
     tension:.4,order:2,
   });
 
@@ -1505,7 +1552,7 @@ function renderAll(){
           pan:{enabled:true,mode:'x'},
         },
         tooltip:{
-          backgroundColor:'#111',borderColor:'#2a2a2a',borderWidth:1,
+          backgroundColor:'#111',borderColor:'#252b31',borderWidth:1,
           titleColor:'#eee',bodyColor:'#666',padding:12,
           titleFont:{family:"'IBM Plex Mono'",size:10,weight:'500'},
           bodyFont:{family:"'IBM Plex Mono'",size:11},
@@ -1524,8 +1571,8 @@ function renderAll(){
         }
       },
       scales:{
-        x:{grid:{color:'#161616'},ticks:{color:'#333',font:{family:"'IBM Plex Mono'",size:9},maxTicksLimit:14},border:{color:'#2a2a2a'}},
-        y:{position:'right',grid:{color:'#161616'},ticks:{color:'#444',font:{family:"'IBM Plex Mono'",size:10},callback:v=>v.toFixed(0)},border:{color:'#2a2a2a'}}
+        x:{grid:{color:'#14181c'},ticks:{color:'#333',font:{family:"'IBM Plex Mono'",size:9},maxTicksLimit:14},border:{color:'#252b31'}},
+        y:{position:'right',grid:{color:'#14181c'},ticks:{color:'#444',font:{family:"'IBM Plex Mono'",size:10},callback:v=>v.toFixed(0)},border:{color:'#252b31'}}
       }
     },
     plugins:[{id:'sep',afterDraw(chart){
@@ -1540,7 +1587,7 @@ function renderAll(){
       c.fillText('NOW',xp,top+9);
       // P0 line
       const yp=y.getPixelForValue(d.P0);
-      c.setLineDash([3,6]);c.strokeStyle='#2a2a2a';c.lineWidth=1;
+      c.setLineDash([3,6]);c.strokeStyle='#252b31';c.lineWidth=1;
       c.beginPath();c.moveTo(left,yp);c.lineTo(right,yp);c.stroke();
       c.setLineDash([]);c.fillStyle='#333';c.textAlign='left';
       c.fillText('P₀ '+d.P0.toFixed(2),left+4,yp-4);
@@ -1555,7 +1602,7 @@ function renderAll(){
   /* ── SCENARIO + CONSENSUS CARDS ── */
   const allCards=[
     ...SC.map((sc,i)=>{
-      const bands=getBands(d.P0,currentHorizon,sc.mu,sc.sig,ac,300);
+      const bands=getBands(d.P0,currentHorizon,sc.mu,sc.sig,ac,Math.min(600,d.n_sim));
       const last=bands[currentHorizon-1];
       const med=last.p50,lo=last.p20,hi=last.p80;
       const diff=med-d.P0,pct=(diff/d.P0*100).toFixed(2),sign=diff>=0?'+':'';
@@ -1586,18 +1633,18 @@ function renderAll(){
   /* ── INSIGHTS (9 métriques avec confiance) ── */
   const sigAnn=(d.sigma*Math.sqrt(252)*100).toFixed(1);
   const insData=[
-    {lbl:'Confidence',  val:conf.total+'/100', sub:confVerdict,               c:confColor.replace('var(--bull)','#48c778').replace('var(--consensus)','#f0c040').replace('var(--bear)','#ff5a5a')},
-    {lbl:'Drift μ',     val:(d.mu*100).toFixed(3)+'%', sub:'calibrated/day',  c:d.mu>=0?'#48c778':'#ff5a5a'},
-    {lbl:'Vol σ',       val:(d.sigma*100).toFixed(2)+'%', sub:'daily fused',   c:'#666'},
+    {lbl:'Confidence',  val:conf.total+'/100', sub:confVerdict,               c:confColor.replace('var(--bull)','#7fb39a').replace('var(--consensus)','#b8a36f').replace('var(--bear)','#c97872')},
+    {lbl:'Drift μ',     val:(d.mu*100).toFixed(3)+'%', sub:'calibrated/day',  c:d.mu>=0?'#7fb39a':'#c97872'},
+    {lbl:'Vol σ',       val:(d.sigma*100).toFixed(2)+'%', sub:'GJR next-day',   c:'#666'},
     {lbl:'Ann. Vol',    val:sigAnn+'%', sub:'√252 × σ',                        c:'#555'},
-    {lbl:'RSI',         val:d.rsi.toFixed(1), sub:d.rsi<40?'Oversold':d.rsi>60?'Overbought':'Neutral', c:d.rsi<40?'#48c778':d.rsi>60?'#ff5a5a':'#5aa0ff'},
-    {lbl:'AR(1)',        val:ac.toFixed(2), sub:'Lag-1 autocorr',              c:'#555'},
-    {lbl:'w(hist)',     val:(d.w_hist*100).toFixed(0)+'%', sub:`N=${d.hist.length} obs`, c:'#5aa0ff'},
+    {lbl:'RSI',         val:d.rsi.toFixed(1), sub:d.rsi<40?'Oversold':d.rsi>60?'Overbought':'Neutral', c:d.rsi<40?'#7fb39a':d.rsi>60?'#c97872':'#89a8bd'},
+    {lbl:'AR(1)',        val:ac.toFixed(2), sub:'return AR(1)',              c:'#555'},
+    {lbl:'w(hist)',     val:(d.w_hist*100).toFixed(0)+'%', sub:`N=${d.hist.length} obs`, c:'#89a8bd'},
     {lbl:'E(X)théo',    val:(d.ex_theo>=0?'+':'')+d.ex_theo.toFixed(3)+'€', sub:'daily theo', c:'#555'},
-    {lbl:'OLS slope',   val:(d.slope>=0?'+':'')+d.slope.toFixed(3), sub:'€·d⁻¹', c:d.slope>=0?'#48c778':'#ff5a5a'},
+    {lbl:'OLS slope',   val:(d.slope>=0?'+':'')+d.slope.toFixed(3), sub:'€·d⁻¹', c:d.slope>=0?'#7fb39a':'#c97872'},
   ];
   document.getElementById('insights').innerHTML=insData.map(ins=>
-    `<div class="ins" style="--c:${ins.c.startsWith('var')?ins.c.slice(4,-1).replace('--bull','#48c778').replace('--consensus','#f0c040').replace('--bear','#ff5a5a'):ins.c}">
+    `<div class="ins" style="--c:${ins.c.startsWith('var')?ins.c.slice(4,-1).replace('--bull','#7fb39a').replace('--consensus','#b8a36f').replace('--bear','#c97872'):ins.c}">
       <div class="ins-lbl">${ins.lbl}</div>
       <div class="ins-val">${ins.val}</div>
       <div class="ins-sub">${ins.sub}</div>
@@ -1615,7 +1662,7 @@ function renderAll(){
     <span class="t-badge">horizon ${currentHorizon}D</span>`;
 
   /* ── DISTRIBUTION ── */
-  const N_DIST=Math.min(d.n_sim,1000);
+  const N_DIST=Math.min(d.n_sim,2500);
   const finals=Array.from({length:N_DIST},(_,i)=>simPath(d.P0,currentHorizon,d.mu,d.sigma,ac,i*997+31)[currentHorizon]);
   finals.sort((a,b)=>a-b);
   const probLoss=(finals.filter(v=>v<d.P0).length/N_DIST*100).toFixed(1);
@@ -1633,20 +1680,20 @@ function renderAll(){
       labels:bins.map(b=>(b.x>=d.P0?'+':'')+((b.x-d.P0)/d.P0*100).toFixed(1)+'%'),
       datasets:[{data:bins.map(b=>b.count),
         backgroundColor:bins.map(b=>b.x<d.P0?'rgba(255,90,90,0.55)':'rgba(72,199,120,0.45)'),
-        borderColor:bins.map(b=>b.x<d.P0?'#ff5a5a':'#48c778'),
+        borderColor:bins.map(b=>b.x<d.P0?'#c97872':'#7fb39a'),
         borderWidth:1,borderRadius:0}]
     },
     options:{
       responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{
-        backgroundColor:'#111',borderColor:'#2a2a2a',borderWidth:1,
+        backgroundColor:'#111',borderColor:'#252b31',borderWidth:1,
         titleFont:{family:"'IBM Plex Mono'",size:9},bodyFont:{family:"'IBM Plex Mono'",size:10},
         titleColor:'#eee',bodyColor:'#666',
         callbacks:{label:item=>`  ${item.raw} paths  (${(item.raw/N_DIST*100).toFixed(1)}%)`}
       }},
       scales:{
-        x:{grid:{display:false},ticks:{color:'#333',font:{family:"'IBM Plex Mono'",size:8},maxTicksLimit:13,maxRotation:30},border:{color:'#2a2a2a'}},
-        y:{grid:{color:'#161616'},ticks:{color:'#333',font:{family:"'IBM Plex Mono'",size:8}},border:{color:'#2a2a2a'}}
+        x:{grid:{display:false},ticks:{color:'#333',font:{family:"'IBM Plex Mono'",size:8},maxTicksLimit:13,maxRotation:30},border:{color:'#252b31'}},
+        y:{grid:{color:'#14181c'},ticks:{color:'#333',font:{family:"'IBM Plex Mono'",size:8}},border:{color:'#252b31'}}
       }
     },
     plugins:[{id:'p0d',afterDraw(chart){
@@ -1674,6 +1721,818 @@ document.getElementById('slH').addEventListener('input',e=>{
   document.getElementById('vH').textContent=currentHorizon+' D';
   if(MODEL) renderAll();
 });
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   EFT v6.0 — RESEARCH ENGINE
+   Bayesian drift shrinkage + AR(1) mean + GJR-GARCH(1,1)
+   + standardized Student-t innovations + simulation-based tail risk.
+
+   Research lineage:
+   • Engle (1982), Bollerslev (1986/1987): ARCH/GARCH volatility clustering
+   • Glosten, Jagannathan & Runkle (1993): asymmetric volatility response
+   • Hansen (1994): Student-t / skewed-t conditional density methods
+   • RiskMetrics (1996): EWMA fallback / volatility diagnostics
+   • Welch & Goyal (2008, 2024 update): strong caution on return predictability
+
+   IMPORTANT: v6 focuses on calibrated distributions, not a deterministic
+   point-price claim. The composite UI "risk score" remains an explanatory
+   indicator; VaR/ES/probability-of-loss are the research-grounded outputs.
+═══════════════════════════════════════════════════════════════════ */
+
+function v6Mean(a){ return a.length ? a.reduce((s,x)=>s+x,0)/a.length : 0; }
+function v6Var(a, m=v6Mean(a)){
+  if(a.length<2) return 0;
+  return a.reduce((s,x)=>s+(x-m)*(x-m),0)/(a.length-1);
+}
+function v6Clamp(x,a,b){ return Math.max(a,Math.min(b,x)); }
+function v6Quantile(sorted,q){
+  if(!sorted.length) return NaN;
+  const p=(sorted.length-1)*q, lo=Math.floor(p), hi=Math.ceil(p);
+  if(lo===hi) return sorted[lo];
+  return sorted[lo]*(hi-p)+sorted[hi]*(p-lo);
+}
+function v6Acf1(x){
+  if(x.length<3) return 0;
+  const m=v6Mean(x); let num=0,den=0;
+  for(let i=1;i<x.length;i++) num+=(x[i]-m)*(x[i-1]-m);
+  for(const v of x) den+=(v-m)*(v-m);
+  return den ? v6Clamp(num/den,-0.95,0.95) : 0;
+}
+function v6LogGamma(z){
+  const p=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  if(z<0.5) return Math.log(Math.PI)-Math.log(Math.sin(Math.PI*z))-v6LogGamma(1-z);
+  z-=1; let x=p[0];
+  for(let i=1;i<p.length;i++) x+=p[i]/(z+i);
+  const t=z+7.5;
+  return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);
+}
+function v6Normal(rng){
+  const u1=Math.max(rng(),1e-12), u2=rng();
+  return Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
+}
+function v6Gamma(shape,rng){
+  if(shape<1){
+    const u=Math.max(rng(),1e-12);
+    return v6Gamma(shape+1,rng)*Math.pow(u,1/shape);
+  }
+  const d=shape-1/3, c=1/Math.sqrt(9*d);
+  for(;;){
+    let x=v6Normal(rng), v=1+c*x;
+    if(v<=0) continue;
+    v=v*v*v;
+    const u=rng();
+    if(u<1-0.0331*x*x*x*x) return d*v;
+    if(Math.log(u)<0.5*x*x+d*(1-v+Math.log(v))) return d*v;
+  }
+}
+function v6StudentT(nu,rng){
+  const n=v6Normal(rng);
+  const chi2=2*v6Gamma(nu/2,rng);
+  const t=n/Math.sqrt(chi2/nu);
+  // standardize to Var(z)=1
+  return t*Math.sqrt((nu-2)/nu);
+}
+function v6TLogPdfStd(z,nu){
+  return v6LogGamma((nu+1)/2)-v6LogGamma(nu/2)
+    -0.5*Math.log(Math.PI*(nu-2))
+    -((nu+1)/2)*Math.log(1+(z*z)/(nu-2));
+}
+
+function v6EstimateAR1(r,mu){
+  if(r.length<12) return {raw:0,phi:0};
+  let num=0,den=0;
+  for(let i=1;i<r.length;i++){
+    const x=r[i-1]-mu, y=r[i]-mu;
+    num+=x*y; den+=x*x;
+  }
+  const raw=den?num/den:0;
+  // shrink noisy short-horizon return autocorrelation hard toward zero
+  const shrink=r.length/(r.length+60);
+  return {raw,phi:v6Clamp(raw*shrink,-0.35,0.35)};
+}
+
+function v6Residuals(r,mu,phi){
+  return r.map((rt,i)=>{
+    if(i===0) return rt-mu;
+    const mt=mu+phi*(r[i-1]-mu);
+    return rt-mt;
+  });
+}
+
+function v6EvalGjr(eps,variance,a,b,g,nu){
+  const persistence=a+b+0.5*g;
+  if(!(a>=0&&b>=0&&g>=0&&persistence<0.995&&nu>4)) return null;
+  const omega=Math.max(1e-12,variance*(1-persistence));
+  let h=Math.max(variance,1e-10), nll=0;
+  const hs=[];
+  for(let t=0;t<eps.length;t++){
+    if(t>0){
+      const e=eps[t-1];
+      h=omega+a*e*e+g*(e<0?e*e:0)+b*h;
+      h=Math.max(h,1e-12);
+    }
+    const z=eps[t]/Math.sqrt(h);
+    const lp=v6TLogPdfStd(z,nu)-0.5*Math.log(h);
+    if(!Number.isFinite(lp)) return null;
+    nll-=lp; hs.push(h);
+  }
+  const eLast=eps[eps.length-1]||0;
+  const hNext=Math.max(omega+a*eLast*eLast+g*(eLast<0?eLast*eLast:0)+b*h,1e-12);
+  return {omega,alpha:a,beta:b,gamma:g,nu,persistence,nll,hLast:h,hNext,hs};
+}
+
+function v6FitGjrT(r,mu,phi){
+  const eps=v6Residuals(r,mu,phi);
+  const variance=Math.max(v6Var(eps),1e-10);
+  if(r.length<25){
+    // Research-informed fallback: stationary EWMA-like specification.
+    return {...v6EvalGjr(eps,variance,0.06,0.90,0.02,8),eps,fitMode:'EWMA-like fallback'};
+  }
+  let best=null;
+  const nus=[5,7,10,15,30];
+  for(let a=0.02;a<=0.18+1e-9;a+=0.02){
+    for(let b=0.72;b<=0.96+1e-9;b+=0.02){
+      for(let g=0;g<=0.20+1e-9;g+=0.04){
+        for(const nu of nus){
+          const ev=v6EvalGjr(eps,variance,+a.toFixed(4),+b.toFixed(4),+g.toFixed(4),nu);
+          if(ev && (!best || ev.nll<best.nll)) best=ev;
+        }
+      }
+    }
+  }
+  // two local coordinate-refinement passes around the coarse optimum
+  for(const step of [0.01,0.005]){
+    const base=best;
+    for(const da of [-step,0,step]) for(const db of [-step,0,step]) for(const dg of [-2*step,0,2*step]){
+      for(const dn of [-2,0,2]){
+        const a=v6Clamp(base.alpha+da,0.001,0.30);
+        const b=v6Clamp(base.beta+db,0.50,0.985);
+        const g=v6Clamp(base.gamma+dg,0,0.40);
+        const nu=v6Clamp(base.nu+dn,4.2,60);
+        const ev=v6EvalGjr(eps,variance,a,b,g,nu);
+        if(ev && ev.nll<best.nll) best=ev;
+      }
+    }
+  }
+  best.eps=eps; best.fitMode='GJR-GARCH-t MLE grid/refine';
+  const z=eps.map((e,i)=>e/Math.sqrt(best.hs[i]||variance));
+  best.stdResiduals=z;
+  return best;
+}
+
+// Correct lag-1 autocorrelation: log returns, not raw price differences.
+calcAutocorr = function(hist){
+  const r=hist.slice(1).map((p,i)=>Math.log(p/hist[i]));
+  if(r.length<3) return 0;
+  const mu=v6Mean(r);
+  return v6EstimateAR1(r,mu).phi;
+};
+
+buildModel = function(){
+  const hist=getPrices(), P0=hist[hist.length-1];
+  const logRet=hist.slice(1).map((p,i)=>Math.log(p/hist[i]));
+  const N=logRet.length;
+  const mu_emp=v6Mean(logRet);
+  const sig_emp=Math.sqrt(Math.max(v6Var(logRet,mu_emp),1e-12));
+
+  const outcomes=[1,2,3].map(i=>({v:+document.getElementById('pv'+i).value||0,p:+document.getElementById('pp'+i).value||0}));
+  const EX=outcomes.reduce((s,o)=>s+o.v*o.p,0);
+  const EX2=outcomes.reduce((s,o)=>s+o.v*o.v*o.p,0);
+  const sigX=Math.sqrt(Math.max(0,EX2-EX*EX));
+  // Correct units: expected € move / P0 = expected simple return.
+  const priorSimple=v6Clamp(EX/Math.max(P0,1e-12),-0.20,0.20);
+  const mu_prior=Math.log1p(priorSimple);
+  const k=Math.max(0,+document.getElementById('iPrior').value||0);
+
+  // Welch-Goyal style conservatism: short-run expected returns are hard to forecast.
+  // Add an explicit zero-drift shrinkage prior to prevent noisy sample means from
+  // dominating 5-60 day forecasts. This improves robustness rather than claiming
+  // a spurious directional edge.
+  const zeroPriorStrength=60;
+  const denom=N+k+zeroPriorStrength;
+  const mu_post=denom>0 ? (N*mu_emp+k*mu_prior)/denom : 0;
+
+  const ar=v6EstimateAR1(logRet,mu_post);
+  const gjr=v6FitGjrT(logRet,mu_post,ar.phi);
+  const sigma=Math.sqrt(gjr.hNext);
+  const mu_uncert=sigma/Math.sqrt(Math.max(denom,1));
+
+  const diffs=hist.slice(1).map((p,i)=>p-hist[i]);
+  const gains=diffs.filter(d=>d>0), losses=diffs.filter(d=>d<0).map(Math.abs);
+  const ag=gains.length?v6Mean(gains):0, al=losses.length?v6Mean(losses):1e-9;
+  const rsi=100-100/(1+ag/al);
+  const xs=hist.map((_,i)=>i), ym=v6Mean(hist), xm=v6Mean(xs);
+  let b1n=0,b1d=0;
+  for(let i=0;i<xs.length;i++){b1n+=(xs[i]-xm)*(hist[i]-ym);b1d+=(xs[i]-xm)**2;}
+
+  const z=gjr.stdResiduals || gjr.eps.map((e,i)=>e/Math.sqrt(gjr.hs[i]||sig_emp*sig_emp));
+  const z2=z.map(x=>x*x);
+  const zAc=v6Acf1(z), z2Ac=v6Acf1(z2);
+  const persistence=gjr.persistence;
+  const w_hist=N/Math.max(1,N+k+zeroPriorStrength);
+
+  MODEL={
+    name:document.getElementById('iName').value||'TICKER',
+    hist,P0,mu:mu_post,sigma,mu_uncert,rsi,slope:b1d?b1n/b1d:0,w_hist,
+    n_sim:+document.getElementById('iNsim').value||1500,
+    ma:v6Mean(hist), ex_theo:EX,sig_theo:sigX,mu_hist_raw:mu_emp,
+    sig_emp,mu_theo:mu_prior,N_obs:N,phi:ar.phi,phi_raw:ar.raw,
+    garch:gjr,stdResiduals:z,zAc,z2Ac,persistence,zeroPriorStrength,
+    engine:'Bayesian Drift + AR(1) + GJR-GARCH-t'
+  };
+};
+
+// Monte Carlo path under AR(1)-GJR-GARCH-t. The legacy sig parameter is kept
+// as a scenario stress multiplier so existing chart/scenario UI remains intact.
+simPath = function(P0,days,mu,sig,ac,seed){
+  const rng=seededRng(seed);
+  const path=[P0];
+  const m=(typeof MODEL!=='undefined'&&MODEL)?MODEL:null;
+  if(!m?.garch){
+    // safe fallback if called before model construction
+    let p=P0;
+    for(let d=0;d<days;d++){
+      const z=v6Normal(rng); p*=Math.exp((mu-0.5*sig*sig)+sig*z); path.push(Math.max(p,0.01));
+    }
+    return path.map(v=>+v.toFixed(3));
+  }
+  const g=m.garch;
+  const scale=v6Clamp(sig/Math.max(m.sigma,1e-12),0.50,1.75);
+  let h=Math.max(g.hNext*scale*scale,1e-12);
+  let epsPrev=g.eps[g.eps.length-1]||0;
+  let prevRet=m.hist.length>1?Math.log(m.hist[m.hist.length-1]/m.hist[m.hist.length-2]):mu;
+  // draw one uncertain drift for the whole path: parameter uncertainty is persistent
+  const muDraw=mu+v6Normal(rng)*m.mu_uncert;
+  for(let d=0;d<days;d++){
+    if(d>0){
+      h=g.omega+g.alpha*epsPrev*epsPrev+g.gamma*(epsPrev<0?epsPrev*epsPrev:0)+g.beta*h;
+      h=Math.max(h,1e-12)*scale*scale;
+    }
+    const z=v6StudentT(g.nu,rng);
+    const mean=muDraw+m.phi*(prevRet-muDraw);
+    const eps=Math.sqrt(h)*z;
+    const ret=mean+eps;
+    const next=path[path.length-1]*Math.exp(ret);
+    path.push(Math.max(next,0.01));
+    epsPrev=eps; prevRet=ret;
+  }
+  return path.map(v=>+v.toFixed(3));
+};
+
+calcConfidence = function(model,autocorr,horizon){
+  const N=model.N_obs||model.hist.length-1;
+  const g=model.garch;
+  const z=model.stdResiduals||[];
+  const nScore=100*(1-Math.exp(-N/90));
+  const ac1=Math.abs(model.zAc||0), ac2=Math.abs(model.z2Ac||0);
+  const whiteScore=100*Math.exp(-9*ac1);
+  const archScore=100*Math.exp(-9*ac2);
+  // approximate two-sided 95% threshold for standardized Student-t
+  const nu=g?.nu||8;
+  const tq=(1.96+2.372/nu+2.822/(nu*nu))*Math.sqrt((nu-2)/nu);
+  const exceed=z.length?z.filter(x=>Math.abs(x)>tq).length/z.length:0.05;
+  const tailScore=100*Math.exp(-12*Math.abs(exceed-0.05));
+  let h=g?.hNext||model.sigma*model.sigma, cum=0, e=0;
+  for(let d=0;d<horizon;d++){
+    cum+=h;
+    h=(g?.omega||0)+(g?.alpha||0)*e+(g?.gamma||0)*0.5*e+(g?.beta||0)*h;
+  }
+  const horizonVol=Math.sqrt(Math.max(cum,0));
+  const horizonScore=100*Math.exp(-3.5*horizonVol);
+  const total=Math.round(v6Clamp(0.20*nScore+0.22*whiteScore+0.22*archScore+0.20*tailScore+0.16*horizonScore,1,100));
+  return {total,horizon,components:[
+    {lbl:'Sample size',score:Math.round(nScore),weight:20,raw:'N='+N,unit:'obs'},
+    {lbl:'Residual AR',score:Math.round(whiteScore),weight:22,raw:'ρ='+((model.zAc||0).toFixed(3)),unit:'target≈0'},
+    {lbl:'Residual ARCH',score:Math.round(archScore),weight:22,raw:'ρ²='+((model.z2Ac||0).toFixed(3)),unit:'target≈0'},
+    {lbl:'Tail calibration',score:Math.round(tailScore),weight:20,raw:(exceed*100).toFixed(1)+'%',unit:'vs 5%'},
+    {lbl:'Horizon uncertainty',score:Math.round(horizonScore),weight:16,raw:(horizonVol*100).toFixed(1)+'%',unit:'σ(T)'},
+  ]};
+};
+
+calcRisk = function(model,autocorr,horizon,simFinals){
+  const P0=model.P0;
+  const s=[...simFinals].sort((a,b)=>a-b);
+  const q01=v6Quantile(s,0.01), q05=v6Quantile(s,0.05), q50=v6Quantile(s,0.50), q95=v6Quantile(s,0.95);
+  const cut=Math.max(1,Math.floor(0.05*s.length));
+  const tail=s.slice(0,cut);
+  const esPrice=v6Mean(tail);
+  const var95=Math.max(0,(P0-q05)/P0*100);
+  const es95=Math.max(0,(P0-esPrice)/P0*100);
+  const pLoss=s.filter(v=>v<P0).length/s.length*100;
+  const tailSpread=Math.max(0,(q95-q05)/P0*100);
+  const r1=v6Clamp(var95/30*100,0,100);
+  const r2=v6Clamp(es95/45*100,0,100);
+  const r3=v6Clamp(pLoss,0,100);
+  const r4=v6Clamp(tailSpread/70*100,0,100);
+  const score=Math.round(v6Clamp(0.30*r1+0.30*r2+0.25*r3+0.15*r4,1,99));
+  const verdict=score>=70?'TRÈS ÉLEVÉ':score>=50?'ÉLEVÉ':score>=30?'MODÉRÉ':score>=15?'FAIBLE':'TRÈS FAIBLE';
+  const color=score>=50?'#c97872':score>=30?'#b8a36f':score>=15?'#7fb39a':'#89a8bd';
+  return {score,verdict,color,components:[
+    {lbl:'VaR 95%',val:var95.toFixed(1)+'%',sub:'simulated quantile',pct:r1,desc:'VaR 95% — quantile Monte Carlo GJR-t'},
+    {lbl:'Expected Shortfall',val:es95.toFixed(1)+'%',sub:'worst 5% mean',pct:r2,desc:'ES 95% — moyenne du pire 5%'},
+    {lbl:'P(perte)',val:pLoss.toFixed(1)+'%',sub:'Monte Carlo',pct:r3,desc:'Probabilité simulée de terminer sous P₀'},
+    {lbl:'Tail spread',val:tailSpread.toFixed(1)+'%',sub:'P5–P95 width',pct:r4,desc:'Largeur de la distribution P5–P95'},
+  ],weights:{w1:.30,w2:.30,w3:.25,w4:.15},var95Pct:var95,pLoss,sigTPct:tailSpread,avgLoss:es95,q01,q05,q50,q95};
+};
+
+// Patch research metrics into the existing insight panel after every render.
+const v6RenderAllBase=renderAll;
+renderAll=function(){
+  v6RenderAllBase();
+  if(!MODEL?.garch) return;
+  const g=MODEL.garch;
+  const conf=calcConfidence(MODEL,MODEL.phi,currentHorizon);
+  const confColor=conf.total>=70?'#7fb39a':conf.total>=45?'#b8a36f':'#c97872';
+  const insData=[
+    {lbl:'Diagnostics',val:conf.total+'/100',sub:conf.total>=70?'well calibrated':conf.total>=45?'mixed':'weak fit',c:confColor},
+    {lbl:'Drift μ',val:(MODEL.mu*100).toFixed(3)+'%',sub:'Bayesian/day',c:MODEL.mu>=0?'#7fb39a':'#c97872'},
+    {lbl:'Next σ',val:(MODEL.sigma*100).toFixed(2)+'%',sub:'GJR conditional',c:'#666'},
+    {lbl:'Ann. Vol',val:(MODEL.sigma*Math.sqrt(252)*100).toFixed(1)+'%',sub:'√252 × next σ',c:'#555'},
+    {lbl:'GJR α',val:g.alpha.toFixed(3),sub:'shock response',c:'#555'},
+    {lbl:'GJR β',val:g.beta.toFixed(3),sub:'vol persistence',c:'#555'},
+    {lbl:'Leverage γ',val:g.gamma.toFixed(3),sub:'negative-shock effect',c:g.gamma>0.08?'#b8a36f':'#555'},
+    {lbl:'Student-t ν',val:g.nu.toFixed(1),sub:g.nu<8?'heavy tails':'moderate tails',c:g.nu<8?'#b8a36f':'#555'},
+    {lbl:'Persistence',val:g.persistence.toFixed(3),sub:'α+β+γ/2',c:g.persistence>0.985?'#b8a36f':'#89a8bd'},
+  ];
+  const el=document.getElementById('insights');
+  if(el) el.innerHTML=insData.map(ins=>`<div class="ins" style="--c:${ins.c}"><div class="ins-lbl">${ins.lbl}</div><div class="ins-val">${ins.val}</div><div class="ins-sub">${ins.sub}</div></div>`).join('');
+};
+</script>
+
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   EFT v7.2 — CALIBRATED RELIABILITY + DURATION-AWARE REGIME PARTICLE ENGINE
+
+   Core idea:
+   • Historical observations update latent Bear / Neutral / Bull regime weights.
+   • Future particles transition between regimes each trading day.
+   • GJR-GARCH-t remains the conditional shock/volatility engine.
+   • Monte Carlo is now path-wise and sequential, not three static drifts.
+
+   IMPORTANT statistical distinction:
+   Future particles cannot be reweighted using observations that do not yet
+   exist. We therefore propagate regime probabilities forward via the fitted
+   transition law. When a new real close is fetched tomorrow, the historical
+   filter is re-run and regime probabilities are reweighted by its likelihood.
+═══════════════════════════════════════════════════════════════════ */
+
+window.EFT_MARKET_DATES = window.EFT_MARKET_DATES || [];
+const v7PopulateMarketDataBase = populateMarketData;
+populateMarketData = function(ticker,pairs,type,source,cacheSavedAt=null){
+  window.EFT_MARKET_DATES = (pairs||[]).map(p=>new Date(p.date));
+  return v7PopulateMarketDataBase(ticker,pairs,type,source,cacheSavedAt);
+};
+
+function v7PdfNormal(x,m,v){
+  v=Math.max(v,1e-12);
+  const z=x-m;
+  return Math.max(1e-300,Math.exp(-0.5*z*z/v)/Math.sqrt(2*Math.PI*v));
+}
+function v7NormVec(a){
+  const s=a.reduce((x,y)=>x+y,0)||1;
+  return a.map(x=>x/s);
+}
+function v7Q(arr,q){
+  if(!arr.length) return NaN;
+  const p=(arr.length-1)*q,lo=Math.floor(p),hi=Math.ceil(p);
+  return lo===hi?arr[lo]:arr[lo]*(hi-p)+arr[hi]*(p-lo);
+}
+function v7SampleCat(p,rng){
+  const u=rng(); let c=0;
+  for(let i=0;i<p.length;i++){ c+=p[i]; if(u<=c) return i; }
+  return p.length-1;
+}
+function v7BusinessDates(lastDate,n){
+  const out=[]; let d=new Date(lastDate||Date.now());
+  while(out.length<n){
+    d=new Date(d.getTime()+86400000);
+    const wd=d.getDay();
+    if(wd!==0&&wd!==6) out.push(new Date(d));
+  }
+  return out;
+}
+function v7FmtDate(d){
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}).replace(' ','-');
+}
+
+// Three-state Gaussian HMM estimated by scaled Baum-Welch.
+// The state process is used for regime probability / persistence, while the
+// shock distribution itself remains Student-t GJR-GARCH in the particle engine.
+function v7FitRegimes(r,globalMu,globalVar){
+  const N=r.length,K=3;
+  if(N<35){
+    const sd=Math.sqrt(Math.max(globalVar,1e-10));
+    return {
+      labels:['BEAR','NEUTRAL','BULL'],
+      means:[globalMu-0.35*sd,globalMu,globalMu+0.35*sd],
+      vars:[globalVar*1.35,globalVar*0.75,globalVar*1.10],
+      T:[[.94,.05,.01],[.04,.92,.04],[.01,.05,.94]],
+      current:[.20,.60,.20], logLik:NaN, fitMode:'regularized fallback'
+    };
+  }
+  const sr=[...r].sort((a,b)=>a-b);
+  let means=[v7Q(sr,.20),v7Q(sr,.50),v7Q(sr,.80)];
+  let vars=[globalVar*1.30,globalVar*0.70,globalVar*1.05].map(x=>Math.max(x,globalVar*.08,1e-10));
+  let T=[[.94,.05,.01],[.04,.92,.04],[.01,.05,.94]];
+  let pi=[.2,.6,.2], last=null;
+
+  for(let iter=0;iter<28;iter++){
+    const lik=Array.from({length:N},(_,t)=>Array.from({length:K},(_,k)=>v7PdfNormal(r[t],means[k],vars[k])));
+    const alpha=Array.from({length:N},()=>Array(K).fill(0));
+    const scale=Array(N).fill(0);
+    for(let k=0;k<K;k++) alpha[0][k]=pi[k]*lik[0][k];
+    scale[0]=alpha[0].reduce((a,b)=>a+b,0)||1e-300;
+    for(let k=0;k<K;k++) alpha[0][k]/=scale[0];
+    for(let t=1;t<N;t++){
+      for(let j=0;j<K;j++){
+        let pred=0; for(let i=0;i<K;i++) pred+=alpha[t-1][i]*T[i][j];
+        alpha[t][j]=pred*lik[t][j];
+      }
+      scale[t]=alpha[t].reduce((a,b)=>a+b,0)||1e-300;
+      for(let j=0;j<K;j++) alpha[t][j]/=scale[t];
+    }
+    const beta=Array.from({length:N},()=>Array(K).fill(1));
+    for(let t=N-2;t>=0;t--){
+      for(let i=0;i<K;i++){
+        let b=0; for(let j=0;j<K;j++) b+=T[i][j]*lik[t+1][j]*beta[t+1][j];
+        beta[t][i]=b/(scale[t+1]||1);
+      }
+    }
+    const gamma=Array.from({length:N},()=>Array(K).fill(0));
+    for(let t=0;t<N;t++){
+      let den=0; for(let k=0;k<K;k++){gamma[t][k]=alpha[t][k]*beta[t][k];den+=gamma[t][k];}
+      den=den||1; for(let k=0;k<K;k++) gamma[t][k]/=den;
+    }
+    const xi=Array.from({length:K},()=>Array(K).fill(0));
+    for(let t=0;t<N-1;t++){
+      let den=0;
+      for(let i=0;i<K;i++) for(let j=0;j<K;j++) den+=alpha[t][i]*T[i][j]*lik[t+1][j]*beta[t+1][j];
+      den=den||1e-300;
+      for(let i=0;i<K;i++) for(let j=0;j<K;j++) xi[i][j]+=alpha[t][i]*T[i][j]*lik[t+1][j]*beta[t+1][j]/den;
+    }
+    pi=v7NormVec(gamma[0]);
+    const newMeans=[],newVars=[];
+    for(let k=0;k<K;k++){
+      let w=0,sm=0; for(let t=0;t<N;t++){w+=gamma[t][k];sm+=gamma[t][k]*r[t];}
+      const mk=w?sm/w:means[k]; newMeans[k]=mk;
+      let sv=0; for(let t=0;t<N;t++) sv+=gamma[t][k]*(r[t]-mk)*(r[t]-mk);
+      newVars[k]=Math.max(w?sv/w:vars[k],globalVar*0.06,1e-10);
+    }
+    const newT=Array.from({length:K},()=>Array(K).fill(0));
+    for(let i=0;i<K;i++){
+      let row=0;
+      for(let j=0;j<K;j++){
+        const prior=(i===j?3.0:0.35); // sticky regularization
+        newT[i][j]=xi[i][j]+prior; row+=newT[i][j];
+      }
+      for(let j=0;j<K;j++) newT[i][j]/=row;
+    }
+    means=newMeans;vars=newVars;T=newT;
+    last={alpha,gamma,scale,logLik:scale.reduce((s,x)=>s+Math.log(Math.max(x,1e-300)),0)};
+  }
+
+  // Sort states by conditional mean so labels are economically stable.
+  const order=[0,1,2].sort((a,b)=>means[a]-means[b]);
+  const remap=order;
+  const sm=remap.map(i=>means[i]), sv=remap.map(i=>vars[i]);
+  const sT=remap.map(i=>remap.map(j=>T[i][j]));
+  const cur=remap.map(i=>last.alpha[N-1][i]);
+  const inv=Array(3); remap.forEach((oldIdx,newIdx)=>inv[oldIdx]=newIdx);
+  const decoded=last.gamma.map(row=>inv[row.indexOf(Math.max(...row))]);
+  const durations=[[],[],[]];
+  let runState=decoded[0], runLen=1;
+  for(let t=1;t<decoded.length;t++){
+    if(decoded[t]===runState) runLen++;
+    else { durations[runState].push(runLen); runState=decoded[t]; runLen=1; }
+  }
+  durations[runState].push(runLen);
+  const currentState=decoded[decoded.length-1];
+  let currentAge=1; for(let t=decoded.length-2;t>=0&&decoded[t]===currentState;t--) currentAge++;
+  const durationParams=durations.map(ds=>{
+    const arr=ds.length?ds:[8];
+    const mean=Math.max(2,v6Mean(arr));
+    const sd=Math.sqrt(Math.max(v6Var(arr,mean),0));
+    const cv=sd/Math.max(mean,1e-9);
+    // Weibull method-of-moments approximation; shape>1 implies rising exit hazard.
+    const shape=v6Clamp(Math.pow(Math.max(cv,0.20),-1.086),0.75,3.25);
+    const scale=mean/Math.exp(v6LogGamma(1+1/shape));
+    return {mean,sd,cv,shape,scale,n:arr.length};
+  });
+  return {labels:['BEAR','NEUTRAL','BULL'],means:sm,vars:sv,T:sT,current:v7NormVec(cur),logLik:last.logLik,fitMode:'3-state duration-aware HMM',decoded,durations,durationParams,currentState,currentAge};
+}
+
+function v7RegimeProbPath(reg,days){
+  let p=[...reg.current]; const out=[];
+  for(let d=0;d<days;d++){
+    const np=[0,0,0];
+    for(let i=0;i<3;i++) for(let j=0;j<3;j++) np[j]+=p[i]*reg.T[i][j];
+    p=v7NormVec(np); out.push([...p]);
+  }
+  return out;
+}
+
+function v7LeaveProb(reg,s,age){
+  const dp=reg.durationParams?.[s];
+  if(!dp) return v6Clamp(1-(reg.T?.[s]?.[s]||0.90),0.005,0.50);
+  const a=Math.max(1,age),k=dp.shape,lam=Math.max(dp.scale,1e-6);
+  const inc=Math.pow(a/lam,k)-Math.pow(Math.max(0,a-1)/lam,k);
+  const p=1-Math.exp(-Math.max(0,inc));
+  // Blend with Markov exit rate for stability when few completed regimes exist.
+  const markovExit=1-(reg.T?.[s]?.[s]||0.90);
+  const reliability=v6Clamp((dp.n||0)/12,0.20,0.85);
+  return v6Clamp(reliability*p+(1-reliability)*markovExit,0.003,0.65);
+}
+function v7NextStateDuration(reg,s,age,rng){
+  const leave=v7LeaveProb(reg,s,age);
+  if(rng()>=leave) return {state:s,age:age+1,leave};
+  const probs=reg.T[s].map((p,j)=>j===s?0:p);
+  const norm=v7NormVec(probs);
+  return {state:v7SampleCat(norm,rng),age:1,leave};
+}
+
+const v7BuildModelBase=buildModel;
+buildModel=function(){
+  v7BuildModelBase();
+  const r=MODEL.hist.slice(1).map((p,i)=>Math.log(p/MODEL.hist[i]));
+  const gv=Math.max(v6Var(r,v6Mean(r)),1e-10);
+  MODEL.regime=v7FitRegimes(r,MODEL.mu,gv);
+  // Conservative state effects: use the HMM signal, but shrink it to avoid
+  // turning in-sample state means into overconfident future drift.
+  MODEL.regime.meanOffset=MODEL.regime.means.map(m=>v6Clamp(0.45*(m-v6Mean(r)),-0.012,0.012));
+  MODEL.regime.volScale=MODEL.regime.vars.map(v=>v6Clamp(Math.sqrt(v/gv),0.65,1.90));
+  MODEL.n_sim=v6Clamp(+document.getElementById('iNsim').value||20000,5000,50000);
+  MODEL.engine='Bayesian + GJR-GARCH-t + 3-state Semi-Markov SMC';
+  window.EFT_V7_CACHE=null;
+};
+
+function v7ParticleForecast(days,N){
+  const m=MODEL, g=m.garch, reg=m.regime;
+  const useN=Math.max(5000,Math.min(N,50000));
+  const cache=window.EFT_V7_CACHE;
+  const key=[m.name,m.P0,days,useN,m.mu.toFixed(8),reg.current.map(x=>x.toFixed(4)).join(',')].join('|');
+  if(cache?.key===key) return cache.value;
+
+  const rng=seededRng(0x7f4a7c15 ^ days ^ useN);
+  const price=new Float64Array(useN), h=new Float64Array(useN), epsPrev=new Float64Array(useN), prevRet=new Float64Array(useN), muDraw=new Float64Array(useN);
+  const state=new Uint8Array(useN), age=new Uint16Array(useN);
+  const lastRet=m.hist.length>1?Math.log(m.hist[m.hist.length-1]/m.hist[m.hist.length-2]):m.mu;
+  const e0=g.eps[g.eps.length-1]||0;
+  for(let i=0;i<useN;i++){
+    price[i]=m.P0;h[i]=g.hNext;epsPrev[i]=e0;prevRet[i]=lastRet;
+    muDraw[i]=m.mu+v6Normal(rng)*m.mu_uncert;
+    state[i]=v7SampleCat(reg.current,rng); age[i]=(state[i]===reg.currentState?Math.max(1,reg.currentAge||1):1);
+  }
+
+  const bands=[], regimeShare=[], repN=Math.min(14,useN);
+  const repIdx=Array.from({length:repN},(_,k)=>Math.floor(k*(useN-1)/Math.max(1,repN-1)));
+  const repMap=new Map(repIdx.map((idx,k)=>[idx,k]));
+  const reps=Array.from({length:repN},()=>[m.P0]);
+  let finalSorted=[];
+
+  for(let d=0;d<days;d++){
+    const dayVals=new Array(useN); const counts=[0,0,0];
+    for(let i=0;i<useN;i++){
+      // latent market state moves every day
+      const tr=v7NextStateDuration(reg,state[i],age[i],rng); const sNext=tr.state; state[i]=sNext; age[i]=tr.age; counts[sNext]++;
+      let hh=h[i];
+      if(d>0){
+        const e=epsPrev[i];
+        hh=Math.max(g.omega+g.alpha*e*e+g.gamma*(e<0?e*e:0)+g.beta*hh,1e-12);
+      }
+      const vs=reg.volScale[sNext];
+      const stateMu=muDraw[i]+reg.meanOffset[sNext];
+      const mean=stateMu+m.phi*(prevRet[i]-stateMu);
+      const z=v6StudentT(g.nu,rng);
+      const eps=Math.sqrt(hh)*vs*z;
+      const ret=mean+eps;
+      const p=Math.max(0.01,price[i]*Math.exp(ret));
+      price[i]=p; h[i]=hh; epsPrev[i]=eps; prevRet[i]=ret; dayVals[i]=p;
+      const rk=repMap.get(i); if(rk!==undefined) reps[rk].push(p);
+    }
+    dayVals.sort((a,b)=>a-b);
+    bands.push({p05:v7Q(dayVals,.05),p10:v7Q(dayVals,.10),p25:v7Q(dayVals,.25),p50:v7Q(dayVals,.50),p75:v7Q(dayVals,.75),p90:v7Q(dayVals,.90),p95:v7Q(dayVals,.95)});
+    regimeShare.push(counts.map(c=>c/useN));
+    if(d===days-1) finalSorted=dayVals;
+  }
+  const value={bands,reps,regimeShare,finalPrices:finalSorted,N:useN};
+  window.EFT_V7_CACHE={key,value};
+  return value;
+}
+
+// Full v7 renderer: one sequential density, not three static scenario drifts.
+renderAll=function(){
+  if(!MODEL?.regime) return;
+  const d=MODEL, ac=d.phi||0;
+  const forecast=v7ParticleForecast(currentHorizon,d.n_sim);
+  const bands=forecast.bands, finalPrices=forecast.finalPrices;
+  const regPath=forecast.regimeShare;
+  const conf=calcConfidence(d,ac,currentHorizon);
+  const confColor=conf.total>=70?'var(--bull)':conf.total>=45?'var(--consensus)':'var(--bear)';
+  const confVerdict=conf.verdict || (conf.total>=70?'STRONG EVIDENCE':conf.total>=45?'MODERATE EVIDENCE':'LOW EVIDENCE');
+  document.getElementById('confNum').textContent=conf.total;
+  document.getElementById('confHorizonLabel').textContent='@ J+'+currentHorizon;
+  document.getElementById('confNum').style.color=confColor;
+  const verdEl=document.getElementById('confVerdict');verdEl.textContent=confVerdict;verdEl.style.color=confColor;verdEl.style.borderColor=confColor;
+  document.getElementById('confBars').innerHTML=conf.components.map(c=>{
+    const bc=c.score>=70?'#7fb39a':c.score>=45?'#b8a36f':'#c97872';
+    return `<div class="conf-bar-row"><span class="conf-bar-lbl">${c.lbl} <span style="color:var(--muted)">(×${c.weight}%)</span></span><div class="conf-bar-track"><div class="conf-bar-fill" style="width:${c.score}%;background:${bc}"></div></div><span class="conf-bar-val">${c.raw}</span><span class="conf-bar-val" style="color:${bc}">${c.score}</span></div>`;
+  }).join('');
+
+  const N_HIST=d.hist.length;
+  const dates=(window.EFT_MARKET_DATES||[]).length===N_HIST?window.EFT_MARKET_DATES:null;
+  const futDates=v7BusinessDates(dates?dates[dates.length-1]:new Date(),currentHorizon);
+  const labels=[...(dates?dates.map(v7FmtDate):d.hist.map((_,i)=>`J${i}`)),...futDates.map(v7FmtDate)];
+  const pad=n=>Array(n).fill(null), base=[...pad(N_HIST-1),d.P0];
+  const datasets=[{
+    label:'Historical',data:[...d.hist,...Array(currentHorizon).fill(null)],borderColor:'#777',borderWidth:1.5,pointRadius:[...d.hist.map(()=>2.5),...Array(currentHorizon).fill(0)],pointBackgroundColor:'#aaa',pointBorderColor:'#090b0d',fill:false,tension:.15,order:0
+  }];
+  // representative particle paths make state-switching visible
+  forecast.reps.forEach((p,k)=>datasets.push({label:`_particle_${k}`,data:[...base,...p.slice(1)],borderColor:'rgba(120,120,120,0.13)',borderWidth:.8,pointRadius:0,fill:false,tension:.18,order:8}));
+  datasets.push({label:'_p10',data:[...base,...bands.map(b=>b.p10)],borderColor:'transparent',backgroundColor:'rgba(90,160,255,0.055)',fill:'+1',pointRadius:0,tension:.26,order:7});
+  datasets.push({label:'_p90',data:[...base,...bands.map(b=>b.p90)],borderColor:'transparent',backgroundColor:'rgba(90,160,255,0.055)',fill:false,pointRadius:0,tension:.26,order:7});
+  datasets.push({label:'_p25',data:[...base,...bands.map(b=>b.p25)],borderColor:'transparent',backgroundColor:'rgba(240,192,64,0.09)',fill:'+1',pointRadius:0,tension:.26,order:6});
+  datasets.push({label:'_p75',data:[...base,...bands.map(b=>b.p75)],borderColor:'transparent',backgroundColor:'rgba(240,192,64,0.09)',fill:false,pointRadius:0,tension:.26,order:6});
+  datasets.push({label:'Weighted Median',data:[...base,...bands.map(b=>b.p50)],borderColor:'#b8a36f',borderWidth:2.6,pointRadius:0,pointHoverRadius:5,fill:false,tension:.30,order:2});
+
+  const ctx=document.getElementById('chart').getContext('2d'); if(chartInst) chartInst.destroy();
+  chartInst=new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,animation:{duration:250},interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},zoom:{zoom:{wheel:{enabled:false},pinch:{enabled:false},mode:'x'},pan:{enabled:true,mode:'x'}},tooltip:{backgroundColor:'#111',borderColor:'#252b31',borderWidth:1,titleColor:'#eee',bodyColor:'#888',callbacks:{label:item=>{if(item.dataset.label.startsWith('_')||item.raw===null)return null;const v=+item.raw,pct=((v-d.P0)/d.P0*100).toFixed(2);return `  ${item.dataset.label.toUpperCase()}  ${v.toFixed(2)} (${pct>=0?'+':''}${pct}%)`;},filter:item=>!item.dataset.label.startsWith('_')&&item.raw!==null}}},scales:{x:{grid:{color:'#14181c'},ticks:{color:'#333',font:{family:"'IBM Plex Mono'",size:9},maxTicksLimit:14},border:{color:'#252b31'}},y:{position:'right',grid:{color:'#14181c'},ticks:{color:'#444',font:{family:"'IBM Plex Mono'",size:10}},border:{color:'#252b31'}}}}});
+
+  // Regime cards
+  const cur=d.regime.current, fut=regPath[currentHorizon-1]||cur;
+  const domNow=cur.indexOf(Math.max(...cur)), domF=fut.indexOf(Math.max(...fut));
+  const styleFor=['pes','neu-card','opt'];
+  const cards=[
+    `<div class="sc-card ${styleFor[domNow]}"><div class="sc-lbl">CURRENT LATENT REGIME</div><div class="sc-price">${d.regime.labels[domNow]}</div><div class="sc-delta">${(cur[domNow]*100).toFixed(1)}%</div><div class="sc-range">Age ≈ ${d.regime.currentAge||1} trading days</div><div class="sc-drift">${d.regime.fitMode}</div></div>`,
+    ...[0,1,2].map(s=>`<div class="sc-card ${styleFor[s]}"><div class="sc-lbl">${d.regime.labels[s]} @ ${v7FmtDate(futDates[futDates.length-1])}</div><div class="sc-price">${(fut[s]*100).toFixed(1)}%</div><div class="sc-delta">now ${(cur[s]*100).toFixed(1)}%</div><div class="sc-range">μ state ${(d.regime.meanOffset[s]*100).toFixed(3)}%/d · vol ×${d.regime.volScale[s].toFixed(2)}</div><div class="sc-drift">Mean duration ${(d.regime.durationParams?.[s]?.mean||0).toFixed(1)}d · shape ${(d.regime.durationParams?.[s]?.shape||1).toFixed(2)}</div></div>`)
+  ];
+  document.getElementById('scRow').innerHTML=cards.join('');
+
+  const g=d.garch, avgStay=(d.regime.T[0][0]+d.regime.T[1][1]+d.regime.T[2][2])/3;
+  const ins=[
+    {lbl:'Reliability',val:conf.total+'/100',sub:confVerdict,c:conf.total>=70?'#7fb39a':conf.total>=45?'#b8a36f':'#c97872'},
+    {lbl:'Particles',val:forecast.N.toLocaleString('en-US'),sub:'sequential paths',c:'#89a8bd'},
+    {lbl:'Regime now',val:d.regime.labels[domNow],sub:(cur[domNow]*100).toFixed(1)+'% filtered',c:['#c97872','#89a8bd','#7fb39a'][domNow]},
+    {lbl:'Regime @H',val:d.regime.labels[domF],sub:(fut[domF]*100).toFixed(1)+'% forecast',c:['#c97872','#89a8bd','#7fb39a'][domF]},
+    {lbl:'Avg stickiness',val:(avgStay*100).toFixed(1)+'%',sub:'state persistence',c:'#555'},
+    {lbl:'Next σ',val:(d.sigma*100).toFixed(2)+'%',sub:'GJR conditional',c:'#666'},
+    {lbl:'Student-t ν',val:g.nu.toFixed(1),sub:g.nu<8?'heavy tails':'moderate tails',c:g.nu<8?'#b8a36f':'#555'},
+    {lbl:'AR(1)',val:d.phi.toFixed(3),sub:'shrunk log-return',c:'#555'},
+    {lbl:'Drift μ',val:(d.mu*100).toFixed(3)+'%',sub:'Bayesian/day',c:d.mu>=0?'#7fb39a':'#c97872'}
+  ];
+  document.getElementById('insights').innerHTML=ins.map(x=>`<div class="ins" style="--c:${x.c}"><div class="ins-lbl">${x.lbl}</div><div class="ins-val">${x.val}</div><div class="ins-sub">${x.sub}</div></div>`).join('');
+
+  const lastBand=bands[bands.length-1], th=document.getElementById('tickerHeader');
+  th.innerHTML=`<span class="t-name">${d.name}</span><span class="t-price">${d.P0.toFixed(2)}</span><span class="t-badge">${d.engine}</span><span class="t-badge">N=${forecast.N.toLocaleString('en-US')}</span><span class="t-badge">${currentHorizon}D</span><span class="t-badge">P10–P90 ${lastBand.p10.toFixed(2)} ↔ ${lastBand.p90.toFixed(2)}</span>`;
+
+  // terminal distribution
+  const s=finalPrices,nBins=32,dMin=s[0],dMax=s[s.length-1],bw=Math.max((dMax-dMin)/nBins,1e-9),bins=Array.from({length:nBins},(_,i)=>({x:dMin+i*bw,count:0}));
+  s.forEach(v=>bins[Math.min(nBins-1,Math.floor((v-dMin)/bw))].count++);
+  const pLoss=s.filter(v=>v<d.P0).length/s.length*100;
+  document.getElementById('distTitle').textContent=`WEIGHTED FINAL DISTRIBUTION · N=${forecast.N.toLocaleString('en-US')} · P(LOSS)=${pLoss.toFixed(1)}%`;
+  const ctx2=document.getElementById('distChart').getContext('2d');if(distInst)distInst.destroy();
+  distInst=new Chart(ctx2,{type:'bar',data:{labels:bins.map(b=>((b.x-d.P0)/d.P0*100).toFixed(1)+'%'),datasets:[{data:bins.map(b=>b.count),backgroundColor:bins.map(b=>b.x<d.P0?'rgba(255,90,90,.50)':'rgba(72,199,120,.42)'),borderColor:bins.map(b=>b.x<d.P0?'#c97872':'#7fb39a'),borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#333',font:{size:8},maxTicksLimit:13}},y:{grid:{color:'#14181c'},ticks:{color:'#333',font:{size:8}}}}}});
+
+  const risk=calcRisk(d,ac,currentHorizon,s); renderRisk(risk,currentHorizon);
+};
+
+// Update visible horizon whenever user edits the numeric control before RUN.
+document.getElementById('iHorizon')?.addEventListener('input',e=>{
+  const h=v6Clamp(+e.target.value||90,5,252); document.getElementById('slH').value=h; document.getElementById('vH').textContent=h+' D';
+});
+</script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   EFT v7.3 — FORECAST RELIABILITY INDEX + SEMANTIC COLOURS
+
+   IMPORTANT:
+   This is NOT a probability that the forecast is "correct".
+   It is an evidence / reliability index for the requested horizon.
+
+   v7.1 overweighted in-sample residual diagnostics. A model can have white
+   residuals and good tail fit while still having weak long-horizon predictive
+   evidence. v7.2 therefore makes horizon-specific historical evidence a hard
+   constraint and caps the score when the requested horizon cannot be tested
+   meaningfully with the available history.
+═══════════════════════════════════════════════════════════════════ */
+calcConfidence = function(model,autocorr,horizon){
+  const N=Math.max(1,model.N_obs||model.hist.length-1);
+  const g=model.garch||{};
+  const z=model.stdResiduals||[];
+
+  // 1) HORIZON-SPECIFIC EVIDENCE (30%)
+  // Number of rolling origins that could exist after preserving a minimum
+  // estimation sample. This is deliberately conservative: if H is longer than
+  // the available history, the model cannot claim empirical reliability at H.
+  const minTrain=Math.min(100,Math.max(60,Math.floor(N*0.55)));
+  const evalWindows=Math.max(0,N-minTrain-horizon+1);
+  const evidenceScore=100*(1-Math.exp(-evalWindows/28));
+
+  // 2) STANDARDISED-RESIDUAL WHITENESS (18%)
+  const ac1=Math.abs(model.zAc||0);
+  const whiteScore=100*Math.exp(-9*ac1);
+
+  // 3) REMAINING ARCH EFFECT (18%)
+  const ac2=Math.abs(model.z2Ac||0);
+  const archScore=100*Math.exp(-9*ac2);
+
+  // 4) TAIL CALIBRATION (14%)
+  // Approx. two-sided 95% threshold for variance-standardised Student-t.
+  const nu=g.nu||8;
+  const tq=(1.96+2.372/nu+2.822/(nu*nu))*Math.sqrt(Math.max((nu-2)/nu,1e-6));
+  const exceed=z.length?z.filter(x=>Math.abs(x)>tq).length/z.length:0.05;
+  const tailScore=100*Math.exp(-12*Math.abs(exceed-0.05));
+
+  // 5) HORIZON UNCERTAINTY (20%)
+  // Accumulate conditional variance under the fitted GJR process. This is not
+  // "forecast error"; it is an explicit penalty for a diffuse long-horizon
+  // predictive distribution.
+  let h=g.hNext||model.sigma*model.sigma, cum=0, e2=0;
+  for(let d=0;d<horizon;d++){
+    cum+=Math.max(h,0);
+    h=(g.omega||0)+(g.alpha||0)*e2+(g.gamma||0)*0.5*e2+(g.beta||0)*h;
+    h=Math.max(h,1e-12);
+  }
+  const horizonVol=Math.sqrt(Math.max(cum,0));
+  const horizonScore=100*Math.exp(-4.2*horizonVol);
+
+  let raw=0.30*evidenceScore+0.18*whiteScore+0.18*archScore+0.14*tailScore+0.20*horizonScore;
+
+  // Hard evidence caps. These prevent clean in-sample diagnostics from being
+  // misread as high long-horizon reliability.
+  let cap=100;
+  if(evalWindows===0) cap=35;
+  else if(evalWindows<8) cap=45;
+  else if(evalWindows<20) cap=60;
+  else if(evalWindows<40) cap=75;
+
+  // Additional extrapolation cap when forecast horizon is large relative to N.
+  const hRatio=horizon/N;
+  if(hRatio>1.00) cap=Math.min(cap,35);
+  else if(hRatio>0.75) cap=Math.min(cap,45);
+  else if(hRatio>0.50) cap=Math.min(cap,60);
+  else if(hRatio>0.30) cap=Math.min(cap,75);
+
+  const total=Math.round(v6Clamp(Math.min(raw,cap),1,100));
+  let verdict;
+  if(evalWindows===0) verdict='UNVALIDATED HORIZON';
+  else if(total>=75) verdict='STRONG EVIDENCE';
+  else if(total>=55) verdict='MODERATE EVIDENCE';
+  else if(total>=40) verdict='LIMITED EVIDENCE';
+  else if(total>=25) verdict='LOW EVIDENCE';
+  else verdict='VERY LOW EVIDENCE';
+
+  return {total,horizon,verdict,rawScore:raw,cap,evalWindows,components:[
+    {lbl:'Horizon evidence',score:Math.round(evidenceScore),weight:30,raw:evalWindows+' windows',unit:'possible'},
+    {lbl:'Residual AR',score:Math.round(whiteScore),weight:18,raw:'ρ='+((model.zAc||0).toFixed(3)),unit:'target≈0'},
+    {lbl:'Residual ARCH',score:Math.round(archScore),weight:18,raw:'ρ²='+((model.z2Ac||0).toFixed(3)),unit:'target≈0'},
+    {lbl:'Tail calibration',score:Math.round(tailScore),weight:14,raw:(exceed*100).toFixed(1)+'%',unit:'vs 5%'},
+    {lbl:'Horizon uncertainty',score:Math.round(horizonScore),weight:20,raw:(horizonVol*100).toFixed(1)+'%',unit:'σ(T)'},
+  ]};
+};
+
+// v7.3 — semantic colour scale: low scores must LOOK low.
+function reliabilityColour(score, verdict){
+  if(verdict==='UNVALIDATED HORIZON') return '#c97872';
+  if(score>=75) return '#7fb39a';   // strong = green
+  if(score>=55) return '#89a8bd';   // moderate = blue
+  if(score>=40) return '#b8a36f';   // limited = amber
+  if(score>=25) return '#b98a70';   // low = orange
+  return '#c97872';                 // very low = red
+}
+function componentColour(score){
+  if(score>=75) return '#7fb39a';
+  if(score>=55) return '#89a8bd';
+  if(score>=40) return '#b8a36f';
+  if(score>=25) return '#b98a70';
+  return '#c97872';
+}
+const v72oldRenderAll=renderAll;
+renderAll=function(){
+  v72oldRenderAll();
+  const conf=MODEL?calcConfidence(MODEL,MODEL.phi,currentHorizon):null;
+  if(!conf) return;
+  const mainColor=reliabilityColour(conf.total,conf.verdict);
+  const lab=document.querySelector('.confidence-block .conf-score-label');
+  if(lab) lab.textContent='/ 100 · INDEX, NOT PROBABILITY';
+  const hv=document.getElementById('confHorizonLabel');
+  if(hv) hv.textContent='@ J+'+currentHorizon+' · '+conf.evalWindows+' horizon windows';
+  const num=document.getElementById('confNum');
+  if(num) num.style.color=mainColor;
+  const v=document.getElementById('confVerdict');
+  if(v){ v.textContent=conf.verdict; v.style.color=mainColor; v.style.borderColor=mainColor; }
+
+  // Re-render breakdown with the same intuitive five-level scale.
+  const bars=document.getElementById('confBars');
+  if(bars){
+    bars.innerHTML=conf.components.map(c=>{
+      const bc=componentColour(c.score);
+      return `<div class="conf-bar-row"><span class="conf-bar-lbl">${c.lbl} <span style="color:var(--muted)">(×${c.weight}%)</span></span><div class="conf-bar-track"><div class="conf-bar-fill" style="width:${c.score}%;background:${bc}"></div></div><span class="conf-bar-val">${c.raw}</span><span class="conf-bar-val" style="min-width:28px;color:${bc}">${c.score}</span></div>`;
+    }).join('');
+  }
+};
 </script>
 </body>
 </html>
