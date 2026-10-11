@@ -309,8 +309,9 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--brig
     </span>
   </div>
   <div class="fetch-block">
-    <input type="text" id="yTicker" value="AAPL" placeholder="AAPL, TSLA, BTC-USD, EURUSD=X…" maxlength="25"
+    <input type="text" id="yTicker" value="AAPL" placeholder="AAPL, TSLA, BTC-USD, EURUSD=X…" maxlength="25" list="eftTickers" autocomplete="off"
       title="Actions US: AAPL TSLA MSFT | Crypto: BTC-USD ETH-USD | Forex: EURUSD=X GBPUSD=X | Paris: MC.PA BNP.PA">
+    <datalist id="eftTickers"></datalist>
     <select id="yPeriod">
       <option value="30">30 jours</option>
       <option value="60">60 jours</option>
@@ -805,51 +806,55 @@ async function fetchViaControlledProxy(ticker, days){
   return parseControlledProxyJson(j, days);
 }
 
-// Yahoo Finance — corrected relay syntax + multiple fallbacks.
-// Public relays are only a fallback. A controlled proxy is more reliable for a hosted app.
+// Daily snapshot published with the site by GitHub Actions (scripts/update_data.py): same-origin, so no relay needed.
+function snapshotName(ticker){ return ticker.replace(/[^A-Z0-9.\-]/g, '_') + '.json'; } // must match file_name() in the script
+
+async function fetchSnapshot(ticker, days){
+  const j = await fetchJson(`data/${snapshotName(ticker)}`, 8000);
+  const out = parseControlledProxyJson(j, days);
+  const last = out.pairs[out.pairs.length-1].date.toLocaleDateString('fr-FR');
+  return {pairs:out.pairs, source:`Yahoo Finance · clôture du ${last}`};
+}
+
+// Order: snapshot (instant) → controlled proxy if configured → public relays raced in parallel.
 async function fetchYahoo(ticker, days){
+  try{
+    setFetchStatus(`Connexion marché · ${ticker}…`, 'loading');
+    return await fetchSnapshot(ticker, days);
+  }catch(_){ /* ticker not in the daily snapshot: go live */ }
+
+  if(EFT_PROXY_URL){
+    try{ return await fetchViaControlledProxy(ticker, days); }catch(_){ /* fall through to public relays */ }
+  }
+
   const period2  = Math.floor(Date.now() / 1000);
   const period1  = period2 - Math.ceil(days * 1.60 + 45) * 86400; // buffer for weekends/holidays
   const mkYahoo  = host => `https://${host}/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&period1=${period1}&period2=${period2}&events=div%2Csplits&includeAdjustedClose=true`;
-  const targets  = [mkYahoo('query1.finance.yahoo.com'), mkYahoo('query2.finance.yahoo.com')];
+  const q1 = encodeURIComponent(mkYahoo('query1.finance.yahoo.com'));
+  const q2 = encodeURIComponent(mkYahoo('query2.finance.yahoo.com'));
 
-  const methods = [];
-
-  if(EFT_PROXY_URL){
-    methods.push({name:'EFT Proxy', fn:()=>fetchViaControlledProxy(ticker, days)});
+  // corsproxy.io now requires an API key, so it is no longer used.
+  const relays = [
+    {name:'AllOrigins',  fn: async()=>parseYahooJson(await fetchJson(`https://api.allorigins.win/raw?url=${q1}`, 20000), days)},
+    {name:'AllOrigins',  fn: async()=>parseYahooJson(JSON.parse((await fetchJson(`https://api.allorigins.win/get?url=${q2}`, 20000)).contents), days)},
+    {name:'CodeTabs',    fn: async()=>parseYahooJson(await fetchJson(`https://api.codetabs.com/v1/proxy?quest=${q1}`, 20000), days)},
+  ];
+  setFetchStatus(`Connexion marché · ${ticker} · ${relays.length} relais en parallèle…`, 'loading');
+  try{
+    return await Promise.any(relays.map(r => r.fn().then(pairs => ({pairs, source:`Yahoo Finance · ${r.name}`}))));
+  }catch(agg){
+    const errs = agg?.errors || [agg];
+    throw errs.find(e => /not found|no data|delisted|introuvable/i.test(String(e?.message || e))) || errs[0];
   }
+}
 
-  for(const target of targets){
-    // IMPORTANT: corsproxy.io now documents ?url=<encoded-url>, not the old bare ?<encoded-url> form.
-    methods.push({
-      name:'CORSProxy · Yahoo Finance',
-      fn: async()=>({pairs:parseYahooJson(await fetchJson(`https://corsproxy.io/?url=${encodeURIComponent(target)}`),days),source:'Yahoo Finance · CORSProxy'})
-    });
-    methods.push({
-      name:'AllOrigins · Yahoo Finance',
-      fn: async()=>({pairs:parseYahooJson(await fetchJson(`https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`),days),source:'Yahoo Finance · AllOrigins'})
-    });
-    methods.push({
-      name:'CodeTabs · Yahoo Finance',
-      fn: async()=>({pairs:parseYahooJson(await fetchJson(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(target)}`),days),source:'Yahoo Finance · CodeTabs'})
-    });
-  }
-
-  let lastErr = null;
-  for(let i=0;i<methods.length;i++){
-    try{
-      setFetchStatus(`Connexion marché ${i+1}/${methods.length} · ${methods[i].name}…`, 'loading');
-      const out = await methods[i].fn();
-      if(!out?.pairs || out.pairs.length < 3) throw new Error('Données insuffisantes.');
-      return out;
-    } catch(e){
-      lastErr = e;
-      const m = String(e?.message || e);
-      if(/not found|no data|delisted|introuvable/i.test(m)) throw e;
-    }
-  }
-
-  throw new Error(lastErr?.message || 'Toutes les sources live ont échoué.');
+// Fills the ticker suggestions with the tickers available in the daily snapshot.
+async function loadSnapshotTickers(){
+  try{
+    const {tickers} = await fetchJson('data/index.json', 8000);
+    const list = document.getElementById('eftTickers');
+    if(list && Array.isArray(tickers)) list.innerHTML = tickers.map(t => `<option value="${t}">`).join('');
+  }catch(_){ /* no snapshot (e.g. opened as a local file): suggestions stay empty */ }
 }
 
 function formatCompactVolume(v){
@@ -922,7 +927,7 @@ async function fetchData(){
     } else {
       let msg = String(e?.message || e || 'Erreur inconnue');
       if(/Failed to fetch|NetworkError|abort|timeout|Load failed/i.test(msg))
-        msg = 'Source live inaccessible depuis ce navigateur.';
+        msg = 'Source live inaccessible depuis ce navigateur. Les tickers proposés dans la liste (AAPL, NVDA, UBS, ^GSPC…) fonctionnent toujours.';
       setFetchStatus(`Erreur live : ${msg} · Vous pouvez toujours saisir/coller les prix manuellement ci-dessous.`, 'err');
       console.warn('[EFT] Market data error:', e);
     }
@@ -932,6 +937,7 @@ async function fetchData(){
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  loadSnapshotTickers();
   const tickerInput = document.getElementById('yTicker');
   if(tickerInput) tickerInput.addEventListener('keydown', e => { if(e.key === 'Enter') fetchData(); });
 });

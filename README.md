@@ -8,7 +8,7 @@ A browser-based equity risk terminal: it calibrates a volatility model on a stoc
 
 ## What it does
 
-1. Downloads daily prices for a ticker (Yahoo Finance, via public CORS proxies).
+1. Loads daily prices for a ticker. About 65 common tickers (US and European stocks, indices, crypto, FX) come from a daily Yahoo Finance snapshot published with the site by GitHub Actions; any other ticker is fetched live through public CORS relays.
 2. Calibrates the model on historical log-returns.
 3. Runs a Monte Carlo simulation (20,000 paths by default, adjustable from 5,000 to 50,000).
 4. Reports risk metrics from the simulated terminal-price distribution:
@@ -40,7 +40,7 @@ A browser-based equity risk terminal: it calibrates a volatility model on a stoc
 
 - Daily prices alone do not make individual-stock returns reliably predictable. The model improves the calibration of volatility and tails; it does not create a directional edge.
 - No walk-forward backtest yet. That is the next step.
-- Data depends on free public proxies, which can be slow or unavailable.
+- Tickers outside the daily snapshot depend on free public relays, which can be slow or unavailable.
 
 ## Documentation
 
