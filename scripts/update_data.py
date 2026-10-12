@@ -11,7 +11,7 @@ BMW.DE MBG.DE VOW3.DE P911.DE SIE.DE
 VOLV-B.ST VOLCAR-B.ST ERIC-B.ST
 HSBA.L BARC.L AZN.L SHEL.L
 ^GSPC ^NDX ^DJI ^STOXX50E ^FTSE ^GDAXI ^FCHI ^OMX
-BTC-USD ETH-USD EURUSD=X GBPUSD=X USDCHF=X GC=F
+BTC-USD ETH-USD SOL-USD XRP-USD EURUSD=X GBPUSD=X USDCHF=X GC=F SI=F CL=F
 """.split()
 
 OUT = pathlib.Path(__file__).resolve().parent.parent / "data"
@@ -29,6 +29,7 @@ def fetch(ticker):
             req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(req, timeout=20) as r:
                 res = json.load(r)["chart"]["result"][0]
+            meta = res.get("meta", {})
             ts = res["timestamp"]
             quote = res["indicators"]["quote"][0]
             adj = (res["indicators"].get("adjclose") or [{}])[0].get("adjclose") or [None] * len(ts)
@@ -38,25 +39,29 @@ def fetch(ticker):
                 if px and px > 0:
                     pairs.append({"date": time.strftime("%Y-%m-%d", time.gmtime(t)), "close": round(px, 6), "vol": vol})
             if len(pairs) >= 3:
-                return pairs
+                exchange = meta.get("fullExchangeName")
+                return pairs, {"t": ticker, "n": meta.get("longName") or meta.get("shortName") or ticker,
+                               "k": meta.get("instrumentType"), "c": meta.get("currency"),
+                               "x": None if exchange in ("CCC", "CCY") else exchange}
         except Exception as e:  # keep going: one bad ticker must not stop the others
             print(f"{ticker} via {host}: {e}", file=sys.stderr)
         time.sleep(0.5)
-    return None
+    return None, None
 
 
 def main():
     OUT.mkdir(exist_ok=True)
-    ok = []
+    catalog = []
     for ticker in TICKERS:
-        pairs = fetch(ticker)
+        pairs, entry = fetch(ticker)
         if pairs:
             out = {"source": "Yahoo Finance", "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "pairs": pairs}
             (OUT / file_name(ticker)).write_text(json.dumps(out, separators=(",", ":")))
-            ok.append(ticker)
+            catalog.append(entry)
         time.sleep(0.3)
-    (OUT / "index.json").write_text(json.dumps({"tickers": ok}))
-    print(f"{len(ok)}/{len(TICKERS)} tickers saved; missing: {sorted(set(TICKERS) - set(ok))}")
+    (OUT / "index.json").write_text(json.dumps({"catalog": catalog}, ensure_ascii=False))
+    saved = {e["t"] for e in catalog}
+    print(f"{len(saved)}/{len(TICKERS)} tickers saved; missing: {sorted(set(TICKERS) - saved)}")
 
 
 if __name__ == "__main__":

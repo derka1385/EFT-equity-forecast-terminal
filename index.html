@@ -194,7 +194,15 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--brig
 /* FETCH BLOCK */
 .fetch-block{background:var(--bg1);border:1px solid var(--line);padding:12px 14px;margin-bottom:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .fetch-block input[type=text]{background:var(--bg2);border:1px solid var(--line2);color:var(--bright);font-family:var(--font);font-size:12px;padding:7px 10px;outline:none;letter-spacing:.06em;transition:border-color .15s;text-transform:none;min-width:0;flex:1 1 120px}
-#yTicker{text-transform:uppercase;flex:1 1 80px;max-width:130px}
+#yTicker{text-transform:uppercase;width:100%}
+.ticker-combo{position:relative;flex:1 1 80px;max-width:130px}
+.ticker-list{position:absolute;top:calc(100% + 4px);left:0;z-index:50;width:min(380px,calc(100vw - 32px));max-height:300px;overflow-y:auto;margin:0;padding:4px 0;list-style:none;background:var(--bg1);border:1px solid var(--line2);box-shadow:0 12px 32px rgba(0,0,0,.45)}
+.ticker-list li{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:baseline;padding:7px 12px;cursor:pointer}
+.ticker-list li b{color:var(--white);font-weight:600;letter-spacing:.04em}
+.ticker-list li span{color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ticker-list li small{grid-column:2;color:var(--dim);font-size:9px;letter-spacing:.06em}
+.ticker-list li[aria-selected="true"],.ticker-list li:hover{background:var(--bg3)}
+.ticker-list li.tk-live{display:block;color:var(--neu);border-top:1px solid var(--line)}
 .fetch-block input[type=text]:focus{border-color:var(--neu)}
 .fetch-block select{background:var(--bg2);border:1px solid var(--line2);color:var(--bright);font-family:var(--font);font-size:10px;padding:7px 8px;outline:none;cursor:pointer;flex-shrink:0}
 .fetch-btn{background:none;border:1px solid var(--neu);color:var(--neu);font-family:var(--font);font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all .15s;flex-shrink:0;touch-action:manipulation}
@@ -309,9 +317,12 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--brig
     </span>
   </div>
   <div class="fetch-block">
-    <input type="text" id="yTicker" value="AAPL" placeholder="AAPL, TSLA, BTC-USD, EURUSD=X…" maxlength="25" list="eftTickers" autocomplete="off"
+    <div class="ticker-combo">
+    <input type="text" id="yTicker" value="AAPL" placeholder="AAPL, BTC, LVMH…" maxlength="40" autocomplete="off" spellcheck="false"
+      role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="tickerList"
       title="Actions US: AAPL TSLA MSFT | Crypto: BTC-USD ETH-USD | Forex: EURUSD=X GBPUSD=X | Paris: MC.PA BNP.PA">
-    <datalist id="eftTickers"></datalist>
+    <ul class="ticker-list" id="tickerList" role="listbox" aria-label="Catalogue de tickers" hidden></ul>
+    </div>
     <select id="yPeriod">
       <option value="30">30 jours</option>
       <option value="60">60 jours</option>
@@ -848,13 +859,85 @@ async function fetchYahoo(ticker, days){
   }
 }
 
-// Fills the ticker suggestions with the tickers available in the daily snapshot.
-async function loadSnapshotTickers(){
+// Ticker catalogue: the tickers of the daily snapshot, searchable by ticker or name ("BTC" → BTC-USD, "lvmh" → MC.PA).
+let EFT_CATALOG = [];
+const TYPE_FR = {EQUITY:'Action', ETF:'ETF', INDEX:'Indice', CRYPTOCURRENCY:'Crypto', CURRENCY:'Forex', FUTURE:'Matière première'};
+const fold = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
+const escHtml = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+
+async function loadCatalog(){
   try{
-    const {tickers} = await fetchJson('data/index.json', 8000);
-    const list = document.getElementById('eftTickers');
-    if(list && Array.isArray(tickers)) list.innerHTML = tickers.map(t => `<option value="${t}">`).join('');
-  }catch(_){ /* no snapshot (e.g. opened as a local file): suggestions stay empty */ }
+    const j = await fetchJson('data/index.json', 8000);
+    if(Array.isArray(j.catalog)) EFT_CATALOG = j.catalog;
+  }catch(_){ /* no snapshot (e.g. opened as a local file): the field works as a plain ticker input */ }
+}
+
+// Rank: exact ticker, ticker prefix, name word prefix, then substring anywhere.
+function searchCatalog(query, catalog = EFT_CATALOG){
+  const q = fold(query).trim();
+  if(!q) return catalog.slice();
+  const hits = [];
+  for(const it of catalog){
+    const t = it.t, n = fold(it.n);
+    const s = t === q ? 0 : t.startsWith(q) ? 1 : n.split(/[^A-Z0-9&]+/).some(w => w.startsWith(q)) ? 2 : (t.includes(q) || n.includes(q)) ? 3 : -1;
+    if(s >= 0) hits.push([s, it]);
+  }
+  return hits.sort((a, b) => a[0] - b[0] || a[1].t.length - b[1].t.length).map(h => h[1]);
+}
+
+function initTickerCombo(){
+  const input = document.getElementById('yTicker'), list = document.getElementById('tickerList');
+  if(!input || !list) return;
+  let active = -1;
+
+  const close = () => { list.hidden = true; active = -1; input.setAttribute('aria-expanded', 'false'); input.removeAttribute('aria-activedescendant'); };
+  const highlight = i => {
+    active = i;
+    [...list.children].forEach((li, k) => li.setAttribute('aria-selected', String(k === i)));
+    const li = list.children[i];
+    if(li){ li.scrollIntoView({block:'nearest'}); input.setAttribute('aria-activedescendant', li.id); }
+    else input.removeAttribute('aria-activedescendant');
+  };
+  const choose = ticker => { input.value = ticker; close(); fetchData(); };
+
+  const render = () => {
+    const q = fold(input.value).trim();
+    const items = searchCatalog(q);
+    const live = q && !items.some(it => it.t === q) && /^[A-Z0-9^.\-=]{1,25}$/.test(q);
+    list.innerHTML = items.map((it, i) => {
+      const meta = [TYPE_FR[it.k] || '', it.x || '', it.c || ''].filter(Boolean).join(' · ');
+      return `<li role="option" id="tk-${i}" data-t="${escHtml(it.t)}"><b>${escHtml(it.t)}</b><span>${escHtml(it.n || '')}</span><small>${escHtml(meta)}</small></li>`;
+    }).join('') + (live ? `<li role="option" id="tk-live" class="tk-live" data-t="${escHtml(q)}">↵ Charger « ${escHtml(q)} » en direct (hors catalogue)</li>` : '');
+    if(!list.children.length){ close(); return; }
+    list.hidden = false;
+    input.setAttribute('aria-expanded', 'true');
+    highlight(q ? 0 : -1); // with a query, Enter takes the best match ("BTC" → BTC-USD)
+  };
+
+  input.addEventListener('input', render);
+  input.addEventListener('focus', () => { input.select(); render(); });
+  input.addEventListener('blur', close);
+  input.addEventListener('keydown', e => {
+    const n = list.children.length;
+    if(e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+      e.preventDefault();
+      if(list.hidden){ render(); return; }
+      if(n) highlight(e.key === 'ArrowDown' ? (active + 1) % n : (active - 1 + n) % n);
+    } else if(e.key === 'Enter'){
+      e.preventDefault();
+      if(!list.hidden && active >= 0) choose(list.children[active].dataset.t);
+      else { close(); fetchData(); }
+    } else if(e.key === 'Escape'){
+      close();
+    }
+  });
+  // mousedown (not click) so the input keeps focus and blur does not close the list first.
+  list.addEventListener('mousedown', e => {
+    const li = e.target.closest('li');
+    if(!li) return;
+    e.preventDefault();
+    choose(li.dataset.t);
+  });
 }
 
 function formatCompactVolume(v){
@@ -937,9 +1020,8 @@ async function fetchData(){
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  loadSnapshotTickers();
-  const tickerInput = document.getElementById('yTicker');
-  if(tickerInput) tickerInput.addEventListener('keydown', e => { if(e.key === 'Enter') fetchData(); });
+  loadCatalog();
+  initTickerCombo();
 });
 
 /* ── VALIDATION ── */
